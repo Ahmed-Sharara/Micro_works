@@ -3,281 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlueGigs Marketplace</title>
+    <title>Responsive Detection</title>
     <style>
         :root {
-            --primary-blue: #2563eb;
-            --dark-blue: #1e40af;
-            --light-blue: #bfdbfe;
-            --background: #f0f4f8;
+            --mobile: #2563eb;
+            --tablet: #10b981;
+            --desktop: #f59e0b;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-
-        body {
-            background-color: var(--background);
-        }
-
-        /* Navigation Bar */
-        .navbar {
-            background: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(30, 64, 175, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--primary-blue);
-            letter-spacing: -1px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-link {
-            color: #1e293b;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .nav-link:hover {
-            color: var(--primary-blue);
-        }
-
-        /* Hero Section */
-        .hero {
+        .device-banner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
             text-align: center;
-            padding: 4rem 1rem;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, #3b82f6 100%);
             color: white;
-        }
-
-        .hero h1 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .search-bar {
-            max-width: 600px;
-            margin: 2rem auto;
-            display: flex;
-            gap: 1rem;
-        }
-
-        .search-input {
-            flex: 1;
-            padding: 1rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
-        .search-button {
-            background: white;
-            color: var(--primary-blue);
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .search-button:hover {
-            background: var(--light-blue);
-        }
-
-        /* Categories */
-        .categories {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            padding: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .category-btn {
-            background: white;
-            color: #1e293b;
-            padding: 0.75rem 1.5rem;
-            border-radius: 20px;
-            border: 1px solid #cbd5e1;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .category-btn.active,
-        .category-btn:hover {
-            background: var(--primary-blue);
-            color: white;
-            border-color: var(--primary-blue);
-        }
-
-        /* Gig Grid */
-        .gig-grid {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .gig-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(30, 64, 175, 0.05);
-            transition: transform 0.3s ease;
-        }
-
-        .gig-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .gig-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-        }
-
-        .gig-content {
-            padding: 1.5rem;
-        }
-
-        .gig-title {
-            font-size: 1.2rem;
-            color: #1e293b;
-            margin-bottom: 0.5rem;
-        }
-
-        .gig-seller {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .seller-avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-        }
-
-        .seller-name {
-            color: #64748b;
-            font-size: 0.9rem;
-        }
-
-        .gig-price {
-            color: var(--primary-blue);
-            font-size: 1.25rem;
             font-weight: bold;
-            margin-top: 1rem;
+            z-index: 1000;
         }
 
-        @media (max-width: 768px) {
-            .nav-links {
+        /* Default desktop styles */
+        body {
+            background: #f8fafc;
+        }
+
+        .content {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        /* Tablet styles (768px - 991px) */
+        @media (max-width: 991px) {
+            body::after {
+                content: "Tablet UI";
+                background: var(--tablet);
+            }
+            
+            .content {
+                padding: 15px;
+            }
+        }
+
+        /* Mobile styles (up to 767px) */
+        @media (max-width: 767px) {
+            body::after {
+                content: "Mobile UI";
+                background: var(--mobile);
+            }
+            
+            .content {
+                padding: 10px;
+            }
+            
+            .desktop-only {
                 display: none;
             }
-            
-            .hero h1 {
-                font-size: 2rem;
-            }
-            
-            .gig-grid {
-                grid-template-columns: 1fr;
+        }
+
+        /* Desktop styles (992px and up) */
+        @media (min-width: 992px) {
+            body::after {
+                content: "Desktop UI";
+                background: var(--desktop);
             }
         }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="logo">BlueGigs</div>
-        <div class="nav-links">
-            <a href="#" class="nav-link">Discover</a>
-            <a href="#" class="nav-link">My Gigs</a>
-            <a href="#" class="nav-link">Messages</a>
-            <img src="profile-pic.jpg" alt="Profile" class="seller-avatar">
-        </div>
-    </nav>
-
-    <div class="hero">
-        <h1>Find Amazing Blue Services</h1>
-        <div class="search-bar">
-            <input type="text" class="search-input" placeholder="Search for services...">
-            <button class="search-button">Search</button>
-        </div>
-    </div>
-
-    <div class="categories">
-        <button class="category-btn active">All</button>
-        <button class="category-btn">Design</button>
-        <button class="category-btn">Development</button>
-        <button class="category-btn">Marketing</button>
-        <button class="category-btn">Writing</button>
-    </div>
-
-    <div class="gig-grid">
-        <!-- Gig Card 1 -->
-        <div class="gig-card">
-            <img src="https://via.placeholder.com/300x200" alt="Gig Image" class="gig-image">
-            <div class="gig-content">
-                <h3 class="gig-title">Modern Website Design</h3>
-                <div class="gig-seller">
-                    <img src="https://via.placeholder.com/30" alt="Seller" class="seller-avatar">
-                    <span class="seller-name">John Doe</span>
-                </div>
-                <div class="gig-price">$299</div>
-            </div>
-        </div>
-
-        <!-- Add more gig cards here -->
+    <div class="device-banner" id="deviceBanner"></div>
+    <div class="content">
+        <h1>Responsive Content</h1>
+        <div class="desktop-only">Desktop-only content</div>
+        <p>Adaptive content for all devices</p>
     </div>
 
     <script>
-        // Add interactive features
-        document.querySelectorAll('.category-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                document.querySelector('.category-btn.active').classList.remove('active');
-                button.classList.add('active');
-            });
-        });
+        // Detect device type on load and resize
+        function detectDevice() {
+            const screenWidth = window.innerWidth;
+            let deviceType = 'desktop';
+            
+            if(screenWidth < 768) deviceType = 'mobile';
+            else if(screenWidth < 992) deviceType = 'tablet';
 
-        // Add dynamic content loading from Google Sheets
-        fetch('YOUR_GOOGLE_SCRIPT_URL?action=getGigs')
-            .then(response => response.json())
-            .then(gigs => {
-                const grid = document.querySelector('.gig-grid');
-                gigs.slice(1).forEach(gig => {
-                    grid.innerHTML += `
-                        <div class="gig-card">
-                            <img src="${gig[3]}" class="gig-image">
-                            <div class="gig-content">
-                                <h3>${gig[0]}</h3>
-                                <div class="gig-seller">
-                                    <img src="${gig[4]}" class="seller-avatar">
-                                    <span>${gig[1]}</span>
-                                </div>
-                                <div class="gig-price">$${gig[2]}</div>
-                            </div>
-                        </div>
-                    `;
-                });
-            });
+            // Update body class
+            document.body.className = deviceType;
+            
+            // Update banner
+            const banner = document.getElementById('deviceBanner');
+            banner.textContent = `${deviceType.toUpperCase()} VIEW (${screenWidth}px)`;
+            banner.style.backgroundColor = 
+                deviceType === 'mobile' ? 'var(--mobile)' :
+                deviceType === 'tablet' ? 'var(--tablet)' : 'var(--desktop)';
+        }
+
+        // Initial detection
+        detectDevice();
+
+        // Update on window resize
+        window.addEventListener('resize', detectDevice);
+
+        // Optional: Log device info
+        console.log({
+            screen: {
+                width: window.innerWidth,
+                height: window.innerHeight,
+                ratio: window.devicePixelRatio
+            },
+            userAgent: navigator.userAgent
+        });
     </script>
 </body>
 </html>
