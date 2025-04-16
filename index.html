@@ -82,7 +82,6 @@
             .then(response => response.text())
             .then(result => {
                 document.getElementById('message').textContent = result;
-                if (result === "Login successful!") loadUsers();
             });
         });
 
