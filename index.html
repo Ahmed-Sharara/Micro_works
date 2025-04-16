@@ -292,7 +292,11 @@
             })
             .then(response => response.text())
             .then(result => {
-                document.getElementById('message').textContent = result;
+                if (result === "Login successful!") {
+                    window.location.href = `main_page.html?email=${encodeURIComponent(email)}`;
+                } else {
+                    document.getElementById('message').textContent = result;
+                }
             });
         });
 
@@ -313,7 +317,11 @@
             .then(response => response.text())
             .then(result => {
                 document.getElementById('message').textContent = result;
-                if (result === "Signup successful!") loadUsers();
+                if (result === "Signup successful!"){
+                    window.location.href = `main_page.html?email=${encodeURIComponent(data.email)}`;
+                } else {
+                     document.getElementById('message').textContent = result;
+                }
             });
         });
 
