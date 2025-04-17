@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Auth Interface</title>
+    <title>Secure Auth Interface</title>
     <style>
         :root {
             --primary: #2563eb;
             --primary-hover: #1d4ed8;
+            --error: #dc2626;
+            --success: #16a34a;
             --background: #f8fafc;
             --base-font-size: clamp(14px, 2vw, 16px);
         }
@@ -102,7 +103,8 @@
         }
 
         .form-group {
-            margin-bottom: clamp(1rem, 3vw, 1.5rem);
+            margin-bottom: clamp(1.5rem, 3vw, 2rem);
+            position: relative;
         }
 
         input {
@@ -114,26 +116,60 @@
             transition: all 0.3s ease;
         }
 
-        input:invalid {
-            border-color: #dc2626;
-            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1);
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        input.error {
+            border-color: var(--error);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        input.success {
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
         }
 
         .error-message {
-            color: #dc2626;
+            color: var(--error);
             font-size: 0.875rem;
             margin-top: 0.25rem;
             display: none;
+            position: absolute;
+            bottom: -1.25rem;
         }
 
         button {
             width: 100%;
             padding: clamp(0.75rem, 2vw, 1rem);
-            font-size: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
             border-radius: clamp(6px, 1vw, 8px);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        /* Mobile-first media queries */
+        button:hover {
+            background: var(--primary-hover);
+        }
+
+        button.loading {
+            background: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        #message {
+            text-align: center;
+            margin-top: 1rem;
+            min-height: 1.5rem;
+            font-weight: 500;
+        }
+
         @media (max-width: 480px) {
             body {
                 padding: 1rem;
@@ -147,88 +183,6 @@
             .tabs {
                 flex-direction: column;
                 gap: 0.5rem;
-            }
-            
-            .tab {
-                width: 100%;
-                text-align: center;
-            }
-        }
-
-        @media (min-width: 768px) {
-            :root {
-                --base-font-size: 16px;
-            }
-            
-            .auth-container {
-                padding: 2.5rem;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .auth-container {
-                transform: scale(1);
-            }
-            
-            .auth-container:hover {
-                transform: scale(1.02);
-            }
-        }
-
-        @media (orientation: landscape) and (max-height: 600px) {
-            body {
-                align-items: flex-start;
-                padding-top: 2rem;
-            }
-            
-            .auth-container {
-                margin-top: 2rem;
-            }
-        }
-
-        /* High-resolution devices */
-        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) { 
-            body {
-                background: linear-gradient(135deg, #6366f1 0%, #2563eb 100%);
-                -webkit-font-smoothing: antialiased;
-            }
-            
-            input, button {
-                border-width: 1.5px;
-            }
-        }
-
-        /* Motion preferences */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                transition: none !important;
-                animation: none !important;
-            }
-        }
-
-        /* Dark mode */
-        @media (prefers-color-scheme: dark) {
-            .auth-container {
-                background: rgba(15, 23, 42, 0.95);
-                color: #ffffff;
-            }
-            
-            input {
-                background: #1e293b;
-                border-color: #334155;
-                color: #ffffff;
-            }
-            
-            .tabs {
-                border-color: #334155;
-            }
-            
-            .tab {
-                color: #94a3b8;
-            }
-            
-            .tab.active {
-                color: #60a5fa;
             }
         }
     </style>
@@ -245,40 +199,68 @@
             <form id="loginForm" class="form active">
                 <div class="form-group">
                     <input type="email" id="loginEmail" placeholder="Email" required>
+                    <span class="error-message" id="loginEmailError"></span>
                 </div>
                 <div class="form-group">
                     <input type="password" id="loginPassword" placeholder="Password" required>
+                    <span class="error-message" id="loginPasswordError"></span>
                 </div>
-                <button type="submit">Continue</button>
+                <button type="submit" id="loginButton">Continue</button>
+                <div id="loginMessage" class="error-message"></div>
             </form>
 
             <!-- Signup Form -->
             <form id="signupForm" class="form">
                 <div class="form-group">
-                    <input type="text" id="signupName" required minlength="3" pattern="[a-zA-Z0-9]+">
+                    <input type="text" id="signupName" placeholder="Username" 
+                           required minlength="3" pattern="[a-zA-Z0-9]+">
+                    <span class="error-message" id="signupNameError">3+ alphanumeric characters</span>
                 </div>
                 <div class="form-group">
-                    <input type="email" id="signupEmail" required>
+                    <input type="email" id="signupEmail" placeholder="Email" required>
+                    <span class="error-message" id="signupEmailError">Invalid email format</span>
                 </div>
                 <div class="form-group">
-                    <input type="password" id="signupPassword" placeholder="Password" required>
+                    <input type="password" id="signupPassword" placeholder="Password" 
+                           required minlength="6" pattern="^(?=.*[A-Za-z])(?=.*\d).{6,}$">
+                    <span class="error-message" id="signupPasswordError">6+ chars with letter and number</span>
                 </div>
-                <button type="submit">Create Account</button>
+                <button type="submit" id="signupButton">Create Account</button>
+                <div id="signupMessage" class="error-message"></div>
             </form>
         </div>
-
-        <div id="message"></div>
     </div>
 
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqbmjLK_Qw419VPzlfZRHw1IbGAwWGZTkbnwDBkyzl-UVCvnLnLO-o7KUIxU1FOlU98g/exec';
+        
+        // Form Validation Logic
+        function setupValidation(form) {
+            const inputs = form.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('input', () => validateField(input));
+                input.addEventListener('blur', () => validateField(input));
+            });
+        }
 
-        // Toggle between Login/Signup forms
+        function validateField(input) {
+            const error = input.parentElement.querySelector('.error-message');
+            if (input.validity.valid) {
+                input.classList.remove('error');
+                input.classList.add('success');
+                error.style.display = 'none';
+            } else {
+                input.classList.remove('success');
+                input.classList.add('error');
+                error.style.display = 'block';
+            }
+        }
+
+        // Toggle Forms
         function showTab(tabName) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
 
-            // Animate forms
             document.querySelectorAll('.form').forEach(form => {
                 form.classList.remove('active');
                 if(form.id === `${tabName}Form`) {
@@ -287,81 +269,107 @@
             });
         }
 
-        // Login
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
+        // Login Handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
+            const button = document.getElementById('loginButton');
+            const message = document.getElementById('loginMessage');
+            
+            if (!e.target.checkValidity()) {
+                e.target.reportValidity();
+                return;
+            }
 
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    action: "login",
-                    email: email,
-                    password: password
-                })
-            })
-            .then(response => response.text())
-            .then(result => {
-                if (result === "Login successful!") {
+            button.disabled = true;
+            button.classList.add('loading');
+            button.textContent = 'Signing in...';
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: "login",
+                        email: document.getElementById('loginEmail').value.trim(),
+                        password: document.getElementById('loginPassword').value
+                    })
+                });
+                
+                const result = await response.text();
+                
+                if (result === "SUCCESS") {
                     window.location.href = "main_page.html";
                 } else {
-                    document.getElementById('message').textContent = result;
+                    message.textContent = "Invalid email or password";
+                    message.style.color = 'var(--error)';
                 }
-            });
+            } catch (error) {
+                message.textContent = "Network error. Please try again.";
+                message.style.color = 'var(--error)';
+            } finally {
+                button.disabled = false;
+                button.classList.remove('loading');
+                button.textContent = 'Continue';
+            }
         });
 
-        // Signup
-        document.getElementById('signupForm').addEventListener('submit', (e) => {
+        // Signup Handler
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const data = {
+            const button = document.getElementById('signupButton');
+            const message = document.getElementById('signupMessage');
+            
+            if (!e.target.checkValidity()) {
+                e.target.reportValidity();
+                return;
+            }
+
+            const userData = {
                 action: "signup",
                 name: document.getElementById('signupName').value.trim(),
                 email: document.getElementById('signupEmail').value.trim().toLowerCase(),
                 password: document.getElementById('signupPassword').value
             };
-			
-			if (!/^[a-zA-Z0-9]{3,}$/.test(data.name)) {
-			    alert("Username must be 3+ alphanumeric characters");
-				return;
-			}
-			
 
-            fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify(data)
-            })
-            .then(response => response.text())
-            .then(result => {
-                if (result === "SUCCESS"){
-                    window.location.href = "main_page.html";
-                } else if( result === "EXIST"){
-                    alert("Username or email already exists!");
-                } else {
-				    alert("Signup failed!");
-				}
-            });
+            button.disabled = true;
+            button.classList.add('loading');
+            button.textContent = 'Creating account...';
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(userData)
+                });
+                
+                const result = await response.text();
+                
+                switch(result) {
+                    case "SUCCESS":
+                        window.location.href = "main_page.html";
+                        break;
+                    case "EXIST":
+                        message.textContent = "Username or email already exists!";
+                        break;
+                    case "INVALID_PW":
+                        message.textContent = "Password must contain 6+ characters with at least 1 letter and 1 number";
+                        break;
+                    default:
+                        message.textContent = "Signup failed. Please try again.";
+                }
+                
+                message.style.color = 'var(--error)';
+            } catch (error) {
+                message.textContent = "Network error. Please check your connection.";
+                message.style.color = 'var(--error)';
+            } finally {
+                button.disabled = false;
+                button.classList.remove('loading');
+                button.textContent = 'Create Account';
+            }
         });
 
-        // Load users (same as before)
-        function loadUsers() {
-            fetch(SCRIPT_URL)
-                .then(response => response.json())
-                .then(users => {
-                    const tbody = document.getElementById('usersBody');
-                    tbody.innerHTML = '';
-                    users.forEach((user, index) => {
-                        if (index === 0) return; // Skip header
-                        tbody.innerHTML += `<tr>
-                            <td>${user[0]}</td>
-                            <td>${user[1]}</td>
-                            <td>${user[2]}</td>
-                        </tr>`;
-                    });
-                });
-        }
-
-        loadUsers(); // Initial load
+        // Initialize validations
+        setupValidation(document.getElementById('loginForm'));
+        setupValidation(document.getElementById('signupForm'));
     </script>
 </body>
 </html>
