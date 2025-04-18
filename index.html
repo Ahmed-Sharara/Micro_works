@@ -1,375 +1,86 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Auth Interface</title>
+    <title>User Signup</title>
     <style>
-        :root {
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --error: #dc2626;
-            --success: #16a34a;
-            --background: #f8fafc;
-            --base-font-size: clamp(14px, 2vw, 16px);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            font-size: var(--base-font-size);
-        }
-
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            min-height: 100svh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #6366f1 0%, #2563eb 100%);
-            padding: 2rem;
-        }
-
-        .auth-container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: clamp(12px, 2vw, 16px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            padding: clamp(1.5rem, 5vw, 2.5rem);
-            width: min(95%, 440px);
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .tabs {
-            display: flex;
-            gap: clamp(1rem, 3vw, 1.5rem);
-            margin-bottom: clamp(1.5rem, 5vw, 2.5rem);
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        .tab {
-            padding: 0.75rem 0;
-            cursor: pointer;
-            color: #64748b;
-            font-weight: 600;
-            position: relative;
-            font-size: clamp(1rem, 2vw, 1.1rem);
-            transition: all 0.3s ease;
-        }
-
-        .tab::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: width 0.3s ease;
-        }
-
-        .tab.active {
-            color: var(--primary);
-        }
-
-        .tab.active::after {
-            width: 100%;
-        }
-
-        .form-container {
-            position: relative;
-            min-height: min(50vh, 400px);
-        }
-
-        .form {
-            position: absolute;
-            width: 100%;
-            opacity: 0;
-            transform: translateX(20px);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none;
-        }
-
-        .form.active {
-            opacity: 1;
-            transform: translateX(0);
-            pointer-events: all;
-        }
-
-        .form-group {
-            margin-bottom: clamp(1.5rem, 3vw, 2rem);
-            position: relative;
-        }
-
-        input {
-            width: 100%;
-            padding: clamp(0.75rem, 2vw, 1rem);
-            border: 2px solid #e2e8f0;
-            border-radius: clamp(6px, 1vw, 8px);
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        input.error {
-            border-color: var(--error);
-            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
-        }
-
-        input.success {
-            border-color: var(--success);
-            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
-        }
-
-        .error-message {
-            color: var(--error);
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-            display: none;
-            position: absolute;
-            bottom: -1.25rem;
-        }
-
-        button {
-            width: 100%;
-            padding: clamp(0.75rem, 2vw, 1rem);
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: clamp(6px, 1vw, 8px);
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        button:hover {
-            background: var(--primary-hover);
-        }
-
-        button.loading {
-            background: #94a3b8;
-            cursor: not-allowed;
-        }
-
-        #message {
-            text-align: center;
-            margin-top: 1rem;
-            min-height: 1.5rem;
-            font-weight: 500;
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 1rem;
-            }
-            
-            .auth-container {
-                border-radius: 12px;
-                padding: 1.5rem;
-            }
-            
-            .tabs {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-        }
+        body { font-family: Arial; padding: 20px; }
+        .form-group { margin: 10px 0; }
+        table { border-collapse: collapse; margin-top: 20px; }
+        td, th { border: 1px solid #ddd; padding: 8px; }
     </style>
 </head>
 <body>
-    <div class="auth-container">
-        <div class="tabs">
-            <span class="tab active" onclick="showTab('login')">Login</span>
-            <span class="tab" onclick="showTab('signup')">Sign Up</span>
+    <h2>Sign Up</h2>
+    <form id="signupForm">
+        <div class="form-group">
+            <input type="text" id="name" placeholder="Name" required>
         </div>
-
-        <div class="form-container">
-            <!-- Login Form -->
-            <form id="loginForm" class="form active">
-                <div class="form-group">
-                    <input type="email" id="loginEmail" placeholder="Email" required>
-                    <span class="error-message" id="loginEmailError"></span>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="loginPassword" placeholder="Password" required>
-                    <span class="error-message" id="loginPasswordError"></span>
-                </div>
-                <button type="submit" id="loginButton">Continue</button>
-                <div id="loginMessage" class="error-message"></div>
-            </form>
-
-            <!-- Signup Form -->
-            <form id="signupForm" class="form">
-                <div class="form-group">
-                    <input type="text" id="signupName" placeholder="Username" 
-                           required minlength="3" pattern="[a-zA-Z0-9]+">
-                    <span class="error-message" id="signupNameError">3+ alphanumeric characters</span>
-                </div>
-                <div class="form-group">
-                    <input type="email" id="signupEmail" placeholder="Email" required>
-                    <span class="error-message" id="signupEmailError">Invalid email format</span>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="signupPassword" placeholder="Password" 
-                           required minlength="6" pattern="^(?=.*[A-Za-z])(?=.*\d).{6,}$">
-                    <span class="error-message" id="signupPasswordError">6+ chars with letter and number</span>
-                </div>
-                <button type="submit" id="signupButton">Create Account</button>
-                <div id="signupMessage" class="error-message"></div>
-            </form>
+        <div class="form-group">
+            <input type="email" id="email" placeholder="Email" required>
         </div>
-    </div>
+        <div class="form-group">
+            <input type="password" id="password" placeholder="Password" required>
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+
+    <h3>Users List</h3>
+    <table id="usersTable">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Password</th>
+            </tr>
+        </thead>
+        <tbody id="usersBody"></tbody>
+    </table>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyqbmjLK_Qw419VPzlfZRHw1IbGAwWGZTkbnwDBkyzl-UVCvnLnLO-o7KUIxU1FOlU98g/exec';
-        
-        // Form Validation Logic
-        function setupValidation(form) {
-            const inputs = form.querySelectorAll('input');
-            inputs.forEach(input => {
-                input.addEventListener('input', () => validateField(input));
-                input.addEventListener('blur', () => validateField(input));
-            });
-        }
+        // Replace with your Google Apps Script URL
+        const SCRIPT_URL = 'AKfycbyqbmjLK_Qw419VPzlfZRHw1IbGAwWGZTkbnwDBkyzl-UVCvnLnLO-o7KUIxU1FOlU98g';
 
-        function validateField(input) {
-            const error = input.parentElement.querySelector('.error-message');
-            if (input.validity.valid) {
-                input.classList.remove('error');
-                input.classList.add('success');
-                error.style.display = 'none';
-            } else {
-                input.classList.remove('success');
-                input.classList.add('error');
-                error.style.display = 'block';
-            }
-        }
-
-        // Toggle Forms
-        function showTab(tabName) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-
-            document.querySelectorAll('.form').forEach(form => {
-                form.classList.remove('active');
-                if(form.id === `${tabName}Form`) {
-                    setTimeout(() => form.classList.add('active'), 50);
-                }
-            });
-        }
-
-        // Login Handler
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        // Submit form
+        document.getElementById('signupForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            const button = document.getElementById('loginButton');
-            const message = document.getElementById('loginMessage');
-            
-            if (!e.target.checkValidity()) {
-                e.target.reportValidity();
-                return;
-            }
-
-            button.disabled = true;
-            button.classList.add('loading');
-            button.textContent = 'Signing in...';
-
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action: "login",
-                        email: document.getElementById('loginEmail').value.trim(),
-                        password: document.getElementById('loginPassword').value
-                    })
-                });
-                
-                const result = await response.text();
-                
-                if (result === "SUCCESS") {
-                    window.location.href = "main_page.html";
-                } else {
-                    message.textContent = "Invalid email or password";
-                    message.style.color = 'var(--error)';
-                }
-            } catch (error) {
-                message.textContent = "Network error. Please try again.";
-                message.style.color = 'var(--error)';
-            } finally {
-                button.disabled = false;
-                button.classList.remove('loading');
-                button.textContent = 'Continue';
-            }
-        });
-
-        // Signup Handler
-        document.getElementById('signupForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const button = document.getElementById('signupButton');
-            const message = document.getElementById('signupMessage');
-            
-            if (!e.target.checkValidity()) {
-                e.target.reportValidity();
-                return;
-            }
-
-            const userData = {
-                action: "signup",
-                name: document.getElementById('signupName').value.trim(),
-                email: document.getElementById('signupEmail').value.trim().toLowerCase(),
-                password: document.getElementById('signupPassword').value
+            const data = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
             };
 
-            button.disabled = true;
-            button.classList.add('loading');
-            button.textContent = 'Creating account...';
-
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(userData)
-                });
-                
-                const result = await response.text();
-                
-                switch(result) {
-                    case "SUCCESS":
-                        window.location.href = "main_page.html";
-                        break;
-                    case "EXIST":
-                        message.textContent = "Username or email already exists!";
-                        break;
-                    case "INVALID_PW":
-                        message.textContent = "Password must contain 6+ characters with at least 1 letter and 1 number";
-                        break;
-                    default:
-                        message.textContent = "Signup failed. Please try again.";
-                }
-                
-                message.style.color = 'var(--error)';
-            } catch (error) {
-                message.textContent = "Network error. Please check your connection.";
-                message.style.color = 'var(--error)';
-            } finally {
-                button.disabled = false;
-                button.classList.remove('loading');
-                button.textContent = 'Create Account';
-            }
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            })
+            .then(response => response.text())
+            .then(result => {
+                alert(result);
+                loadUsers(); // Refresh the user list
+            });
         });
 
-        // Initialize validations
-        setupValidation(document.getElementById('loginForm'));
-        setupValidation(document.getElementById('signupForm'));
+        // Load users from Google Sheets
+        function loadUsers() {
+            fetch(SCRIPT_URL)
+                .then(response => response.json())
+                .then(users => {
+                    const tbody = document.getElementById('usersBody');
+                    tbody.innerHTML = '';
+                    users.forEach((user, index) => {
+                        if (index === 0) return; // Skip header row
+                        const row = `<tr>
+                            <td>${user[0]}</td>
+                            <td>${user[1]}</td>
+                            <td>${user[2]}</td>
+                        </tr>`;
+                        tbody.innerHTML += row;
+                    });
+                });
+        }
+
+        // Load users on page load
+        loadUsers();
     </script>
 </body>
 </html>
