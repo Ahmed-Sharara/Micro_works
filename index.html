@@ -45,7 +45,7 @@
     </form>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxNakNB-SiHzTRvNkZjKdheW4Q7DP42HP48FtfodwYgJ8vT9c8TYWn4nftC3RG_rqvExw/exec':
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby6GDVrkRdoq1XNErfqSBkBNbUB_c3N2S2DsUuVKhhE247ehJv51Fp8azOHGFJWaLkpaA/exec';
 
         // Form visibility toggle
         function showForm(formType) {
@@ -79,7 +79,6 @@
                 if (result.includes('success')) {
                     document.getElementById('signupForm').reset();
 					window.location.href = 'main_page.html';
-                    loadUsers();
                 }
             });
         });
@@ -103,7 +102,6 @@
                 });
         });
 
-        loadUsers();
     </script>
 </body>
 </html>
