@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Work - MicroWork</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+</head>
+<body>
+    <div class="nav">
+        <div class="nav-left">
+            <button onclick="navigate('home')">
+                <i class="fas fa-home"></i> Home
+            </button>
+            <button onclick="navigate('view_tasks')">
+                <i class="fas fa-tasks"></i> View Tasks
+            </button>
+            <button onclick="navigate('my_tasks')">
+                <i class="fas fa-clipboard-list"></i> My Tasks
+            </button>
+        </div>
+        <div class="nav-right">
+            <div>
+                <i class="fas fa-coins"></i> <span id="userCoins">0</span>
+            </div>
+            <div>Logged in as: <strong id="username"></strong></div>
+            <button onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>
+            <i class="fas fa-paper-plane"></i> Submit Work
+        </h2>
+        <div id="taskDetails" class="task-header">
+            <p>Loading task details...</p>
+        </div>
+        
+        <div class="error" id="submissionError" style="display: none;"></div>
+        
+        <div class="submission-form">
+            <form id="submitForm" onsubmit="handleSubmit(event)">
+                <div class="form-group">
+                    <label for="answer">
+                        <i class="fas fa-edit"></i> Your Solution
+                    </label>
+                    <textarea id="answer" rows="8" placeholder="Enter your solution..." required></textarea>
+                    <p class="text-muted">Provide a thorough and professional solution to increase your chances of approval.</p>
+                </div>
+                <div class="submission-actions">
+                    <button type="button" class="btn-secondary" onclick="navigate('view_tasks')">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-paper-plane"></i> Submit Work
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 MicroWork. All rights reserved.</p>
+        <div>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Contact Us</a>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        const user = getCurrentUser();
+        const taskId = new URLSearchParams(window.location.search).get('task');
+        
+        // Redirect to login if not logged in
+        if (!user) {
+            window.location.href = 'index.html';
+            throw new Error('User not logged in');
+        } else {
+            document.getElementById('username').textContent = user;
+        }
+
+        // Redirect if no task ID
+        if (!taskId) {
+            window.location.href = 'view_tasks.html?user=' + encodeURIComponent(user);
+            throw new Error('No task ID provided');
+        }
+
+        // Load user's coin balance
+        loadCoins('userCoins');
+
+        // Load task details
+        async function loadTaskDetails() {
+            try {
+                const data = await apiGet('get-task', { task_id: taskId });
+                
+                if (!data.task) {
+                    document.getElementById('taskDetails').innerHTML = '<p>Task not found.</p>';
+                    document.getElementById('submitForm').style.display = 'none';
+                    return;
+                }
+                
+                const task = data.task;
+                
+                document.getElementById('taskDetails').innerHTML = `
+                    <div class="task-card">
+                        <h3>${task.title}</h3>
+                        <p>${task.description}</p>
+                        <div class="task-info">
+                            <div class="price">
+                                <i class="fas fa-coins"></i> ${task.prize} coins
+                            </div>
+                            <div class="buyer">
+                                <i class="fas fa-user"></i> ${task.buyer_username}
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <span class="status ${task.status}">${task.status}</span>
+                        </div>
+                    </div>
+                `;
+                
+                // Disable form if task is not open or user is the buyer
+                if (task.status !== 'open' || task.buyer_username === user) {
+                    document.getElementById('submitForm').style.display = 'none';
+                    document.getElementById('taskDetails').innerHTML += `
+                        <div class="error">
+                            ${task.status !== 'open' ? 'This task is no longer accepting submissions.' : 'You cannot submit work for your own task.'}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('taskDetails').innerHTML = `<p>Error loading task: ${error.message}</p>`;
+                document.getElementById('submitForm').style.display = 'none';
+            }
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+            
+            const errorElement = document.getElementById('submissionError');
+            errorElement.style.display = 'none';
+            
+            const answer = document.getElementById('answer').value;
+            
+            try {
+                const data = await apiPost('submit-work', {
+                    task_id: taskId,
+                    worker_username: user,
+                    sub_answer: answer
+                });
+                
+                if (data.success) {
+                    alert('Work submitted successfully!');
+                    window.location.href = 'my_tasks.html?user=' + encodeURIComponent(user);
+                } else {
+                    errorElement.textContent = data.message || 'Submission failed';
+                    errorElement.style.display = 'block';
+                }
+            } catch (error) {
+                errorElement.textContent = error.message;
+                errorElement.style.display = 'block';
+            }
+        }
+
+        // Load task details when page loads
+        loadTaskDetails();
+    </script>
+</body>
+</html>

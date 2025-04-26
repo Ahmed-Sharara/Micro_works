@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - Task Platform</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="nav">
+        <div class="nav-left">
+            <button onclick="navigate('home')">Home</button>
+            <button onclick="navigate('view_tasks')">View Tasks</button>
+            <button onclick="navigate('my_tasks')">My Tasks</button>
+        </div>
+        <div class="nav-right">
+            <div>Coins: <span id="userCoins">0</span></div>
+            <div>Logged in as: <strong id="username"></strong></div>
+            <button onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Add Payment Address</h2>
+        <div class="payment-instructions">
+            <h3>Instructions</h3>
+            <ol>
+                <li>Add your USDT wallet address below.</li>
+                <li>Our system will connect your account to this wallet.</li>
+                <li>You'll be able to deposit and withdraw funds using this wallet.</li>
+            </ol>
+        </div>
+        
+        <div class="error" id="paymentError" style="display: none;"></div>
+        
+        <div class="payment-form">
+            <form id="paymentForm" onsubmit="handlePayment(event)">
+                <div class="form-group">
+                    <label for="address">USDT Wallet Address</label>
+                    <input type="text" id="address" placeholder="Enter your USDT wallet address" required>
+                </div>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        const user = getCurrentUser();
+        
+        // Redirect to login if not logged in
+        if (!user) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('username').textContent = user;
+        }
+
+        // Load user's coin balance
+        loadCoins('userCoins');
+
+        async function handlePayment(e) {
+            e.preventDefault();
+            
+            const errorElement = document.getElementById('paymentError');
+            errorElement.style.display = 'none';
+            
+            const address = document.getElementById('address').value;
+            
+            try {
+                const data = await apiPost('add-payment-address', {
+                    buyer_username: user,
+                    usdt_wallet_address: address
+                });
+                
+                if (data.success) {
+                    alert('Payment address added successfully!');
+                    document.getElementById('paymentForm').reset();
+                } else {
+                    errorElement.textContent = data.message || 'Failed to add payment address';
+                    errorElement.style.display = 'block';
+                }
+            } catch (error) {
+                errorElement.textContent = error.message;
+                errorElement.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Tasks - MicroWork</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Tab styles */
+        .tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            border-radius: var(--radius) var(--radius) 0 0;
+            overflow: hidden;
+        }
+        
+        .tab-btn {
+            background: transparent;
+            color: var(--text-muted);
+            border: none;
+            padding: 1rem 1.5rem;
+            margin-bottom: -1px;
+            font-weight: 600;
+            transition: var(--transition);
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .tab-btn:hover {
+            color: var(--text-light);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .tab-btn.active {
+            color: var(--primary-color);
+            background-color: var(--card-bg);
+        }
+        
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--primary-color);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 0.5rem 0 2rem;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Task Grid Layout */
+        .task-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .task-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: row;
+            position: relative;
+        }
+        
+        .task-card:hover {
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary-color);
+        }
+        
+        .task-price-tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #2941c9; /* Darker blue than primary-color */
+            color: white;
+            padding: 0.4rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            z-index: 2;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .task-left {
+            width: 70%;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border-right: 1px solid var(--border-color);
+        }
+        
+        .task-right {
+            width: 30%;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+        
+        .task-header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding-right: 5rem; /* Make room for price tag */
+        }
+        
+        .task-header-info h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 0.35rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status.open {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .status.pending {
+            background-color: var(--warning-color);
+            color: var(--dark-bg);
+        }
+        
+        .status.approved {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .status.closed {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .task-description {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        
+        .task-meta {
+            display: flex;
+            gap: 1.25rem;
+            margin-top: auto;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 1rem;
+        }
+        
+        .task-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        .task-meta i {
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+        
+        .task-cta {
+            margin-top: 1rem;
+            width: 100%;
+        }
+        
+        .task-btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--radius);
+            border: none;
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            justify-content: center;
+            font-size: 0.95rem;
+            width: 100%;
+        }
+        
+        .task-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .task-btn.secondary {
+            background-color: var(--medium-bg);
+            color: var(--text-light);
+            border: 1px solid var(--border-color);
+        }
+        
+        .task-btn.secondary:hover {
+            background-color: var(--dark-bg);
+        }
+        
+        .task-difficulty {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+        }
+        
+        .difficulty-level {
+            display: flex;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+        
+        .difficulty-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--border-color);
+            margin: 0 2px;
+        }
+        
+        .difficulty-dot.active {
+            background-color: var(--primary-color);
+        }
+        
+        .task-time {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .time-icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        /* Submissions styling */
+        .submission-container {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .submission {
+            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        
+        .submission:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(0, 0, 0, 0.15);
+        }
+        
+        .submission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+        
+        .submission-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .submission-info p {
+            margin: 0;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .submission-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.4rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-badge.approved {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .status-badge.pending {
+            background-color: var(--warning-color);
+            color: var(--dark-bg);
+        }
+        
+        .submission-content {
+            padding: 0.75rem;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: var(--radius);
+            margin: 0.5rem 0;
+            transition: var(--transition);
+        }
+        
+        .submission-content.expanded {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .submission-content.collapsed {
+            max-height: 80px;
+            overflow: hidden;
+        }
+        
+        .preview {
+            margin: 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .full-answer {
+            white-space: pre-wrap;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        .submission-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            justify-content: flex-end;
+        }
+        
+        .submission-btn {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .submission-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .details-btn {
+            background-color: #2941c9;
+            color: white;
+            border: none;
+            box-shadow: 0 4px 15px rgba(41, 65, 201, 0.3);
+        }
+        
+        .details-btn:hover {
+            background-color: #3a56d4;
+            color: #000;
+            transform: translateY(-2px);
+        }
+        
+        .details-btn:hover i {
+            color: #000;
+        }
+        
+        .approve-btn {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+        }
+        
+        .approve-btn:hover {
+            background-color: var(--success-dark);
+        }
+        
+        /* Page header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .page-header h2 {
+            margin: 0;
+            font-size: 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-light);
+        }
+        
+        /* Skeleton loading */
+        .skeleton {
+            background: linear-gradient(90deg, var(--card-bg) 25%, rgba(255, 255, 255, 0.05) 50%, var(--card-bg) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: var(--radius);
+            height: 20px;
+            margin-bottom: 0.5rem;
+        }
+        
+        @keyframes skeleton-loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        
+        /* Old navbar styles removed to avoid conflicts with enhanced navbar */
+        
+        /* Container for page content */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem 2rem;
+        }
+        
+        /* Footer styles */
+        .footer {
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1rem;
+        }
+        
+        .footer-copyright {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            
+            .task-card {
+                flex-direction: column;
+            }
+            
+            .task-left, .task-right {
+                width: 100%;
+                border-right: none;
+            }
+            
+            .task-left {
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .task-right {
+                padding-top: 1rem;
+            }
+            
+            .task-difficulty, .task-time {
+                display: inline-block;
+                margin: 0 1rem 1rem;
+            }
+            
+            .task-cta {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .tabs {
+                flex-direction: column;
+                border-radius: var(--radius);
+            }
+            
+            .tab-btn {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .tab-btn.active::after {
+                height: 0;
+            }
+            
+            .task-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Enhanced navbar with glass effect and better styling -->
+    <header class="main-header">
+        <nav class="main-navbar">
+            <div class="navbar-brand">
+                <i class="fas fa-tasks"></i> Micro<span>Work</span>
+            </div>
+            
+            <div class="navbar-menu">
+                <a href="#" onclick="navigate('home'); return false;" class="menu-item">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#" onclick="navigate('view_tasks'); return false;" class="menu-item">
+                    <i class="fas fa-search"></i>
+                    <span>Browse Tasks</span>
+                </a>
+                <a href="#" onclick="navigate('my_tasks'); return false;" class="menu-item active">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>My Tasks</span>
+                </a>
+                <a href="#" onclick="navigate('withdraw'); return false;" class="menu-item">
+                    <i class="fas fa-wallet"></i>
+                    <span>Withdraw</span>
+                </a>
+            </div>
+            
+            <div class="navbar-actions">
+                <div class="user-balance">
+                    <i class="fas fa-coins"></i> <span id="userCoins">0</span>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span id="username"></span>
+                </div>
+                <a href="#" onclick="logout(); return false;" class="logout-button">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </div>
+        </nav>
+    </header>
+    
+    <style>
+        /* Enhanced navbar styles */
+        .main-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            margin-bottom: 2rem;
+        }
+        
+        .main-navbar {
+            background: rgba(24, 27, 61, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-radius: var(--radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .navbar-brand i {
+            color: #2941c9;
+        }
+        
+        .navbar-brand span {
+            background: linear-gradient(to right, #4361ee, #7a89ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .menu-item {
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .menu-item.active {
+            background-color: rgba(41, 65, 201, 0.15);
+            color: #4361ee;
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .user-balance {
+            background: linear-gradient(135deg, #2941c9, #4361ee);
+            padding: 0.6rem 1.25rem;
+            border-radius: 50px;
+            color: white;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(41, 65, 201, 0.3);
+        }
+        
+        .user-balance i {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background-color: rgba(255, 255, 255, 0.06);
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4361ee, #7a89ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: white;
+        }
+        
+        .logout-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        
+        .logout-button:hover {
+            background-color: rgba(239, 68, 68, 0.2);
+            transform: rotate(360deg);
+        }
+        
+        @media (max-width: 992px) {
+            .main-navbar {
+                flex-wrap: wrap;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .navbar-menu {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                overflow-x: auto;
+                padding: 0.5rem 0;
+            }
+            
+            .menu-item {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .navbar-actions {
+                gap: 0.75rem;
+            }
+            
+            .user-balance {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.9rem;
+            }
+            
+            .user-profile span {
+                display: none;
+            }
+        }
+    </style>
+
+    <div class="main-container">
+        <div class="page-header">
+            <h2>
+                <i class="fas fa-clipboard-list"></i> My Tasks
+            </h2>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('created')">
+                <i class="fas fa-file-circle-plus"></i> Tasks I Created
+            </button>
+            <button class="tab-btn" onclick="showTab('submitted')">
+                <i class="fas fa-paper-plane"></i> Tasks I Submitted
+            </button>
+        </div>
+
+        <div id="createdTasksTab" class="tab-content active">
+            <div id="createdTasksList" class="task-grid">
+                <!-- Skeleton loading state -->
+                <div class="task-card">
+                    <div class="task-left" style="position: relative;">
+                        <div class="skeleton" style="width: 70%; height: 28px; margin-bottom: 15px;"></div>
+                        <div class="skeleton" style="width: 80px; height: 20px; margin-bottom: 25px;"></div>
+                        <div class="skeleton" style="width: 100%; height: 14px;"></div>
+                        <div class="skeleton" style="width: 95%; height: 14px;"></div>
+                        <div class="skeleton" style="width: 90%; height: 14px;"></div>
+                        <div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                            <div class="skeleton" style="width: 120px; height: 18px;"></div>
+                        </div>
+                    </div>
+                    <div class="task-right" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <div class="skeleton" style="width: 80px; height: 18px; margin-bottom: 10px;"></div>
+                        <div style="display: flex; gap: 5px; margin-bottom: 25px;">
+                            <div class="skeleton" style="width: 10px; height: 10px; border-radius: 50%;"></div>
+                            <div class="skeleton" style="width: 10px; height: 10px; border-radius: 50%;"></div>
+                            <div class="skeleton" style="width: 10px; height: 10px; border-radius: 50%;"></div>
+                        </div>
+                        <div class="skeleton" style="width: 100%; height: 40px; border-radius: var(--radius);"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="submittedTasksTab" class="tab-content">
+            <div id="submittedTasksList" class="task-grid">
+                <!-- Skeleton loading state -->
+                <div class="task-card">
+                    <div class="task-left" style="position: relative;">
+                        <div class="skeleton" style="width: 70%; height: 28px; margin-bottom: 15px;"></div>
+                        <div class="skeleton" style="width: 80px; height: 20px; margin-bottom: 25px;"></div>
+                        <div class="skeleton" style="width: 100%; height: 14px;"></div>
+                        <div class="skeleton" style="width: 95%; height: 14px;"></div>
+                        <div class="skeleton" style="width: 90%; height: 14px;"></div>
+                        <div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                            <div class="skeleton" style="width: 120px; height: 18px;"></div>
+                        </div>
+                    </div>
+                    <div class="task-right" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <div class="skeleton" style="width: 80px; height: 18px; margin-bottom: 10px;"></div>
+                        <div class="skeleton" style="width: 100%; height: 40px; border-radius: var(--radius);"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-copyright">
+                &copy; 2025 MicroWork. All rights reserved.
+            </div>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Us</a>
+                <a href="#">Help Center</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        // Template for rendering a single submission
+        function submissionTemplate(sub, taskId) {
+            return `
+                <div class="submission ${sub.status}">
+                    <div class="submission-header">
+                        <div class="submission-info">
+                            <p><i class="fas fa-user"></i> <strong>${sub.worker_username}</strong></p>
+                            <p><i class="fas fa-calendar-alt"></i> ${new Date(sub.submission_date || Date.now()).toLocaleDateString()}</p>
+                        </div>
+                        <div class="submission-status">
+                            ${sub.status === 'approved' ? 
+                                `<span class="status-badge approved">
+                                    <i class="fas fa-check-circle"></i> Approved
+                                </span>` : 
+                                `<span class="status-badge pending">
+                                    <i class="fas fa-clock"></i> Pending Review
+                                </span>`
+                            }
+                        </div>
+                    </div>
+                    <div class="submission-content ${sub.expanded ? 'expanded' : 'collapsed'}" id="submission-${sub.submission_id}-content">
+                        <p class="preview">${sub.sub_answer.length > 100 ? sub.sub_answer.substring(0, 100) + '...' : sub.sub_answer}</p>
+                        <div class="full-answer" style="display: none;">
+                            <p>${sub.sub_answer}</p>
+                        </div>
+                    </div>
+                    <div class="submission-actions">
+                        <button class="submission-btn details-btn" onclick="toggleAnswerDetails(${sub.submission_id})">
+                            <i class="fas fa-eye"></i> View Details
+                        </button>
+                        ${sub.status === 'pending' ? `
+                            <button class="submission-btn approve-btn" onclick="approveSubmission(${sub.submission_id}, ${taskId})">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+    
+        const user = getCurrentUser();
+        
+        // Redirect to login if not logged in
+        if (!user) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('username').textContent = user;
+        }
+
+        // Load user's coin balance
+        loadCoins('userCoins');
+
+        // Tab functionality
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(`${tabName}TasksTab`).classList.add('active');
+            
+            // Add active class to clicked button
+            event.currentTarget.classList.add('active');
+        }
+
+        // Load tasks created by the user
+        async function loadCreatedTasks() {
+            try {
+                const data = await apiGet('list-tasks', { 
+                    username: user, 
+                    buyer_only: true 
+                });
+                
+                const tasksList = document.getElementById('createdTasksList');
+                
+                if (!data.tasks || data.tasks.length === 0) {
+                    tasksList.innerHTML = `
+                        <div class="alert alert-info" style="text-align: center; padding: 2rem;">
+                            <i class="fas fa-info-circle fa-lg" style="margin-right: 10px;"></i> 
+                            You haven't created any tasks yet.
+                        </div>`;
+                    return;
+                }
+                
+                // Filter tasks where the user is the buyer
+                const userTasks = data.tasks.filter(task => task.buyer_username === user);
+                
+                if (userTasks.length === 0) {
+                    tasksList.innerHTML = `
+                        <div class="alert alert-info" style="text-align: center; padding: 2rem;">
+                            <i class="fas fa-info-circle fa-lg" style="margin-right: 10px;"></i> 
+                            You haven't created any tasks yet.
+                        </div>`;
+                    return;
+                }
+                
+                tasksList.innerHTML = userTasks.map(task => `
+                    <div class="task-card">
+                        <div class="task-price-tag">
+                            <i class="fas fa-coins"></i> ${task.prize}
+                        </div>
+                        
+                        <div class="task-left">
+                            <div class="task-header-info">
+                                <div>
+                                    <h3>${task.title}</h3>
+                                    <span class="status ${task.status}">${task.status}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-description">
+                                ${task.description}
+                            </div>
+                            
+                            <div class="task-meta">
+                                <div class="task-meta-item">
+                                    <i class="fas fa-user"></i> Posted by: ${task.buyer_username}
+                                </div>
+                                <div class="task-meta-item">
+                                    <i class="fas fa-calendar-alt"></i> ${new Date().toLocaleDateString()}
+                                </div>
+                                <div class="task-meta-item">
+                                    <i class="fas fa-clipboard-check"></i> Submissions: ${task.submissions ? task.submissions.length : 0}
+                                </div>
+                            </div>
+                            
+                            ${task.submissions && task.submissions.length > 0 ? `
+                                <div class="submission-container">
+                                    <h4 style="color: var(--text-light); margin-bottom: 1rem; font-size: 1rem;">
+                                        <i class="fas fa-clipboard-check"></i> Recent Submissions
+                                    </h4>
+                                    ${task.submissions.slice(0, 2).map(sub => submissionTemplate(sub, task.task_id)).join('')}
+                                    ${task.submissions.length > 2 ? `
+                                        <div style="text-align: center; margin-top: 1rem;">
+                                            <a href="#" onclick="navigate('task_details', {task: ${task.task_id}}); return false;" 
+                                               style="color: var(--primary-color); text-decoration: none; font-weight: 600;">
+                                                See all ${task.submissions.length} submissions <i class="fas fa-arrow-right"></i>
+                                            </a>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="task-right">
+                            <div class="task-difficulty">
+                                <div>Status</div>
+                                <span class="status ${task.status}" style="margin-top: 0.5rem;">
+                                    ${task.status.toUpperCase()}
+                                </span>
+                            </div>
+                            
+                            <div class="task-time">
+                                <i class="fas fa-clipboard-list time-icon"></i>
+                                <div>${task.submissions ? task.submissions.length : 0} Submissions</div>
+                            </div>
+                            
+                            <div class="task-cta">
+                                <button class="task-btn" onclick="navigate('task_details', {task: ${task.task_id}})">
+                                    <i class="fas fa-clipboard-check"></i> Manage Task
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                document.getElementById('createdTasksList').innerHTML = `
+                    <div class="alert alert-danger" style="text-align: center; padding: 2rem;">
+                        <i class="fas fa-exclamation-circle fa-lg" style="margin-right: 10px;"></i> 
+                        Error loading tasks: ${error.message}
+                    </div>`;
+            }
+        }
+
+        // Load submissions made by the user
+        async function loadSubmittedTasks() {
+            try {
+                const data = await apiGet('get-user-submissions', {
+                    username: user
+                });
+                
+                const submissionsList = document.getElementById('submittedTasksList');
+                
+                if (!data.submissions || data.submissions.length === 0) {
+                    submissionsList.innerHTML = `
+                        <div class="alert alert-info" style="text-align: center; padding: 2rem;">
+                            <i class="fas fa-info-circle fa-lg" style="margin-right: 10px;"></i> 
+                            You haven't submitted any work yet.
+                        </div>`;
+                    return;
+                }
+                
+                submissionsList.innerHTML = data.submissions.map(sub => `
+                    <div class="task-card">
+                        <div class="task-price-tag">
+                            <i class="fas fa-coins"></i> ${sub.prize || 0}
+                        </div>
+                        
+                        <div class="task-left">
+                            <div class="task-header-info">
+                                <div>
+                                    <h3>${sub.task_title || 'Task #' + sub.task_id}</h3>
+                                    <span class="status ${sub.status}">${sub.status}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-description">
+                                <p><strong>Your submission:</strong></p>
+                                <p>${sub.sub_answer}</p>
+                            </div>
+                            
+                            <div class="task-meta">
+                                <div class="task-meta-item">
+                                    <i class="fas fa-calendar-alt"></i> Submitted: ${new Date(sub.submission_date || Date.now()).toLocaleDateString()}
+                                </div>
+                                <div class="task-meta-item">
+                                    <i class="fas fa-clipboard-check"></i> Status: ${sub.status}
+                                </div>
+                                ${sub.status === 'approved' ? `
+                                <div class="task-meta-item">
+                                    <i class="fas fa-coins"></i> Earned: ${sub.prize || 0} coins
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                        
+                        <div class="task-right">
+                            <div class="task-difficulty">
+                                <div>Status</div>
+                                <span class="status-badge ${sub.status}" style="margin-top: 0.5rem;">
+                                    ${sub.status === 'approved' ? 
+                                    '<i class="fas fa-check-circle"></i> Approved' : 
+                                    '<i class="fas fa-clock"></i> Pending Review'}
+                                </span>
+                            </div>
+                            
+                            <div class="task-time">
+                                <i class="${sub.status === 'approved' ? 'fas fa-check-circle' : 'fas fa-hourglass-half'} time-icon"></i>
+                                <div>${sub.status === 'approved' ? 'Completed' : 'Awaiting Review'}</div>
+                            </div>
+                            
+                            <div class="task-cta">
+                                <button class="task-btn ${sub.status === 'approved' ? 'secondary' : ''}" 
+                                        ${sub.status === 'approved' ? 'disabled' : ''}
+                                        onclick="window.location.href='view_tasks.html?user=${user}'">
+                                    <i class="fas fa-search"></i> Find More Tasks
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                document.getElementById('submittedTasksList').innerHTML = `
+                    <div class="alert alert-danger" style="text-align: center; padding: 2rem;">
+                        <i class="fas fa-exclamation-circle fa-lg" style="margin-right: 10px;"></i> 
+                        Error loading submissions: ${error.message}
+                    </div>`;
+            }
+        }
+
+        // Approve a submission
+        async function approveSubmission(submissionId, taskId) {
+            if (!confirm('Are you sure you want to approve this submission? This action cannot be undone.')) return;
+            
+            try {
+                // Extract worker username from the DOM - improved extraction method
+                let workerUsername = null;
+                const submission = document.querySelector(`.submission-btn[onclick*="approveSubmission(${submissionId})"]`).closest('.submission');
+                const userElement = submission.querySelector('.submission-info p:first-child strong');
+                
+                if (userElement) {
+                    workerUsername = userElement.textContent.trim();
+                }
+                
+                if (!workerUsername) {
+                    alert('Could not determine worker username. Please refresh the page and try again.');
+                    return;
+                }
+                
+                // Show loading state
+                const approveButton = submission.querySelector('.approve-btn');
+                const originalButtonText = approveButton.innerHTML;
+                approveButton.disabled = true;
+                approveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Approving...';
+                
+                // Make the API request with all necessary parameters
+                const data = await apiPost('approve-submission', {
+                    submission_id: submissionId,
+                    buyer_username: user,
+                    worker_username: workerUsername,
+                    task_id: taskId
+                });
+                
+                if (data.success) {
+                    // Show success state
+                    approveButton.innerHTML = '<i class="fas fa-check"></i> Approved!';
+                    
+                    // Reload data after a short delay
+                    setTimeout(() => {
+                        loadCreatedTasks();
+                        loadCoins('userCoins');
+                    }, 1000);
+                } else {
+                    // Reset button on failure
+                    approveButton.disabled = false;
+                    approveButton.innerHTML = originalButtonText;
+                    alert(data.message || 'Approval failed');
+                }
+            } catch (error) {
+                alert('Approval failed: ' + error.message);
+            }
+        }
+
+        // Toggle answer details visibility with smooth transition
+        function toggleAnswerDetails(submissionId) {
+            const contentElement = document.getElementById(`submission-${submissionId}-content`);
+            const fullAnswer = contentElement.querySelector('.full-answer');
+            const preview = contentElement.querySelector('.preview');
+            const button = contentElement.parentElement.querySelector('.details-btn');
+            
+            if (fullAnswer.style.display === 'none') {
+                // Show full answer
+                fullAnswer.style.display = 'block';
+                preview.style.display = 'none';
+                contentElement.classList.remove('collapsed');
+                contentElement.classList.add('expanded');
+                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Details';
+            } else {
+                // Show preview
+                fullAnswer.style.display = 'none';
+                preview.style.display = 'block';
+                contentElement.classList.remove('expanded');
+                contentElement.classList.add('collapsed');
+                button.innerHTML = '<i class="fas fa-eye"></i> View Details';
+            }
+        }
+
+        // Load data when page loads
+        loadCreatedTasks();
+        loadSubmittedTasks();
+    </script>
+</body>
+</html>

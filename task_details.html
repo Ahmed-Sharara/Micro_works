@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Details - MicroWork</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom styles specific to task details page */
+        .task-header {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+            box-shadow: var(--shadow);
+            color: white;
+        }
+        
+        .task-header h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .task-header p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            opacity: 0.9;
+        }
+        
+        .task-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .task-info div {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .task-info i {
+            font-size: 1.2rem;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-badge.open {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .status-badge.closed {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .status-badge.pending {
+            background-color: var(--warning-color);
+            color: var(--dark-bg);
+        }
+        
+        .status-badge.approved {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .submissions-container {
+            margin-top: 2rem;
+            position: relative;
+        }
+        
+        .submissions-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .submissions-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .submissions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .submission {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .submission:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-3px);
+        }
+        
+        .submission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .submission-header p {
+            margin: 0;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .submission-header p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .submission-content {
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .submission-content.collapsed {
+            max-height: 100px;
+        }
+        
+        .submission-content.expanded {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .submission-content .preview {
+            margin: 0;
+            color: var(--text-muted);
+        }
+        
+        .submission-content .full-answer {
+            white-space: pre-line;
+        }
+        
+        .submission-actions {
+            display: flex;
+            gap: 1rem;
+            padding: 1.25rem;
+            border-top: 1px solid var(--border-color);
+            background-color: rgba(0, 0, 0, 0.1);
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        
+        .submission-actions button {
+            padding: 0.6rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        
+        .submission-actions button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+        }
+        
+        .btn-success:hover {
+            background-color: var(--success-dark);
+        }
+        
+        .btn-secondary {
+            background-color: var(--medium-bg);
+            color: var(--text-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            cursor: pointer;
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--dark-bg);
+        }
+        
+        /* Alert styles */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .alert-info {
+            background-color: rgba(66, 153, 225, 0.15);
+            border-left: 4px solid #4299e1;
+            color: #4299e1;
+        }
+        
+        .alert-warning {
+            background-color: rgba(236, 201, 75, 0.15);
+            border-left: 4px solid #ecc94b;
+            color: #ecc94b;
+        }
+        
+        .alert-danger {
+            background-color: rgba(245, 101, 101, 0.15);
+            border-left: 4px solid #f56565;
+            color: #f56565;
+        }
+        
+        .alert i {
+            font-size: 1.2rem;
+        }
+        
+        /* Navbar styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .navbar-brand span {
+            color: var(--primary-color);
+        }
+        
+        .navbar-nav {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-link {
+            padding: 0.5rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-balance {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            padding: 0.4rem 0.75rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        
+        .user-info {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        /* Container for page content */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem 2rem;
+        }
+        
+        /* Footer styles */
+        .footer {
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1rem;
+        }
+        
+        .footer-copyright {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .navbar-nav, .user-menu {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .task-info {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .submission-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .submission-status {
+                align-self: flex-start;
+            }
+            
+            .submission-actions {
+                justify-content: center;
+            }
+            
+            .submission-actions button {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Improved navbar with brand and better aligned elements -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <i class="fas fa-tasks"></i> Micro<span>Work</span>
+        </div>
+        <div class="navbar-nav">
+            <div class="nav-item">
+                <a href="#" onclick="navigate('home'); return false;" class="nav-link">
+                    <i class="fas fa-home"></i> Home
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" onclick="navigate('view_tasks'); return false;" class="nav-link">
+                    <i class="fas fa-tasks"></i> Browse Tasks
+                </a>
+            </div>
+            <div class="nav-item">
+                <a href="#" onclick="navigate('my_tasks'); return false;" class="nav-link active">
+                    <i class="fas fa-clipboard-list"></i> My Tasks
+                </a>
+            </div>
+        </div>
+        <div class="user-menu">
+            <div class="user-balance">
+                <i class="fas fa-coins"></i> <span id="userCoins">0</span>
+            </div>
+            <div class="user-info">
+                <span id="username"></span>
+            </div>
+            <div class="nav-item">
+                <a href="#" onclick="logout(); return false;" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div id="taskDetails" class="task-header">
+            <div class="loading-indicator">
+                <i class="fas fa-circle-notch fa-spin"></i> Loading task details...
+            </div>
+        </div>
+        
+        <div class="submissions-container">
+            <div class="submissions-header">
+                <h2>
+                    <i class="fas fa-clipboard-check"></i> Submissions
+                </h2>
+            </div>
+            <div id="submissionsList" class="submissions-list">
+                <div class="loading-indicator">
+                    <i class="fas fa-circle-notch fa-spin"></i> Loading submissions...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-copyright">
+                &copy; 2025 MicroWork. All rights reserved.
+            </div>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Us</a>
+                <a href="#">Help Center</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        const user = getCurrentUser();
+        const taskId = new URLSearchParams(window.location.search).get('task');
+        
+        // Redirect to login if not logged in
+        if (!user) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('username').textContent = user;
+        }
+        
+        // Redirect if no task ID
+        if (!taskId) {
+            window.location.href = 'my_tasks.html?user=' + encodeURIComponent(user);
+        }
+
+        // Load user's coin balance
+        loadCoins('userCoins');
+
+        // Load task details
+        async function loadTaskDetails() {
+            try {
+                const data = await apiGet('get-task', { task_id: taskId });
+                
+                if (!data.task) {
+                    document.getElementById('taskDetails').innerHTML = `
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> Task not found.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const task = data.task;
+                
+                document.getElementById('taskDetails').innerHTML = `
+                    <h1>${task.title}</h1>
+                    <p>${task.description}</p>
+                    <div class="task-info">
+                        <div>
+                            <i class="fas fa-coins"></i> ${task.prize} coins
+                        </div>
+                        <div>
+                            <i class="fas fa-user"></i> Posted by: ${task.buyer_username}
+                        </div>
+                        <div>
+                            <i class="fas fa-calendar-alt"></i> Created: ${new Date(task.created_at || Date.now()).toLocaleDateString()}
+                        </div>
+                    </div>
+                    <span class="status-badge ${task.status}">
+                        <i class="fas fa-${task.status === 'open' ? 'unlock' : 'lock'}"></i> ${task.status.toUpperCase()}
+                    </span>
+                `;
+                
+                // Only show submissions if user is the owner
+                if (task.buyer_username !== user) {
+                    document.getElementById('submissionsList').innerHTML = `
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i> You don't have permission to view submissions for this task.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                loadSubmissions();
+            } catch (error) {
+                document.getElementById('taskDetails').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> Error loading task: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Load submissions for this task
+        async function loadSubmissions() {
+            try {
+                // Show loading state
+                document.getElementById('submissionsList').innerHTML = `
+                    <div class="loading-indicator">
+                        <i class="fas fa-circle-notch fa-spin"></i> Loading submissions...
+                    </div>
+                `;
+                
+                const data = await apiGet('get-task-submissions', { 
+                    task_id: taskId,
+                    buyer_username: user
+                });
+                
+                const submissionsList = document.getElementById('submissionsList');
+                
+                if (!data.submissions || data.submissions.length === 0) {
+                    submissionsList.innerHTML = `
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No submissions yet. Check back later!
+                        </div>
+                    `;
+                    return;
+                }
+                
+                submissionsList.innerHTML = data.submissions.map(sub => `
+                    <div class="submission ${sub.status}">
+                        <div class="submission-header">
+                            <div class="submission-info">
+                                <p>
+                                    <i class="fas fa-user"></i> <strong>${sub.worker_username}</strong>
+                                </p>
+                                <p>
+                                    <i class="fas fa-calendar-alt"></i> Submitted on: ${new Date(sub.submission_date || Date.now()).toLocaleDateString()}
+                                </p>
+                            </div>
+                            <div class="submission-status">
+                                ${sub.status === 'approved' ? 
+                                    `<span class="status-badge approved">
+                                        <i class="fas fa-check-circle"></i> Approved
+                                    </span>` : 
+                                    `<span class="status-badge pending">
+                                        <i class="fas fa-clock"></i> Pending Review
+                                    </span>`
+                                }
+                            </div>
+                        </div>
+                        <div class="submission-content ${sub.expanded ? 'expanded' : 'collapsed'}" id="submission-${sub.submission_id}-content">
+                            <p class="preview">${sub.sub_answer.length > 100 ? sub.sub_answer.substring(0, 100) + '...' : sub.sub_answer}</p>
+                            <div class="full-answer" style="display: none;">
+                                <p>${sub.sub_answer}</p>
+                            </div>
+                        </div>
+                        <div class="submission-actions">
+                            <button class="btn-secondary" onclick="toggleAnswerDetails(${sub.submission_id})">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                            ${sub.status === 'pending' ? `
+                                <button class="btn-success" onclick="approveSubmission(${sub.submission_id})">
+                                    <i class="fas fa-check"></i> Approve Submission
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                document.getElementById('submissionsList').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> Error loading submissions: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Toggle answer details visibility with smooth transition
+        function toggleAnswerDetails(submissionId) {
+            const contentElement = document.getElementById(`submission-${submissionId}-content`);
+            const fullAnswer = contentElement.querySelector('.full-answer');
+            const preview = contentElement.querySelector('.preview');
+            const button = contentElement.parentElement.querySelector('button.btn-secondary');
+            
+            if (fullAnswer.style.display === 'none') {
+                // Show full answer
+                fullAnswer.style.display = 'block';
+                preview.style.display = 'none';
+                contentElement.classList.remove('collapsed');
+                contentElement.classList.add('expanded');
+                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Details';
+            } else {
+                // Show preview
+                fullAnswer.style.display = 'none';
+                preview.style.display = 'block';
+                contentElement.classList.remove('expanded');
+                contentElement.classList.add('collapsed');
+                button.innerHTML = '<i class="fas fa-eye"></i> View Details';
+            }
+        }
+        
+        // Approve a submission
+        async function approveSubmission(submissionId) {
+            const confirmDialog = confirm('Are you sure you want to approve this submission? This action cannot be undone.');
+            if (!confirmDialog) return;
+            
+            try {
+                // Extract worker username from the DOM - improved extraction method
+                let workerUsername = null;
+                const submission = document.querySelector(`.submission button[onclick*="approveSubmission(${submissionId})"]`).closest('.submission');
+                const userElement = submission.querySelector('p:first-child strong');
+                
+                if (userElement) {
+                    workerUsername = userElement.textContent.trim();
+                }
+                
+                if (!workerUsername) {
+                    alert('Could not determine worker username. Please refresh the page and try again.');
+                    return;
+                }
+                
+                // Show loading state
+                const approveButton = submission.querySelector('.btn-success');
+                const originalButtonText = approveButton.innerHTML;
+                approveButton.disabled = true;
+                approveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Approving...';
+                
+                // Make the API request with all necessary parameters
+                const data = await apiPost('approve-submission', {
+                    submission_id: submissionId,
+                    buyer_username: user,
+                    worker_username: workerUsername,
+                    task_id: taskId
+                });
+                
+                if (data.success) {
+                    // Show success state
+                    approveButton.innerHTML = '<i class="fas fa-check"></i> Approved!';
+                    approveButton.classList.remove('btn-success');
+                    approveButton.classList.add('btn-secondary');
+                    
+                    // Reload data after a short delay
+                    setTimeout(() => {
+                        loadSubmissions();
+                        loadTaskDetails();
+                        loadCoins('userCoins');
+                    }, 1000);
+                } else {
+                    // Reset button on failure
+                    approveButton.disabled = false;
+                    approveButton.innerHTML = originalButtonText;
+                    alert(data.message || 'Approval failed');
+                }
+            } catch (error) {
+                alert('Approval failed: ' + error.message);
+            }
+        }
+
+        // Load task details when page loads
+        loadTaskDetails();
+    </script>
+</body>
+</html>
