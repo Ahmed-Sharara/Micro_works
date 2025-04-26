@@ -7,9 +7,179 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Enhanced navbar styles */
+        .main-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            margin-bottom: 2rem;
+        }
+        
+        .main-navbar {
+            background: rgba(24, 27, 61, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-radius: var(--radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .navbar-brand {
+            font-size: 28.8px;
+            font-family: "Inter", sans-serif;
+            font-weight: 800;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .navbar-brand i {
+            color: #2941c9;
+        }
+        
+        .navbar-brand span {
+            background: linear-gradient(to right, #4361ee, #7a89ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .menu-item {
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .menu-item.active {
+            background-color: rgba(41, 65, 201, 0.15);
+            color: #4361ee;
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .user-balance {
+            background: linear-gradient(135deg, #2941c9, #4361ee);
+            padding: 0.6rem 1.25rem;
+            border-radius: 50px;
+            color: #ffffff;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(41, 65, 201, 0.3);
+        }
+        
+        .user-balance span {
+            color: #ffffff;
+        }
+        
+        .user-balance i {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background-color: rgba(255, 255, 255, 0.06);
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4361ee, #7a89ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: white;
+        }
+        
+        .logout-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        
+        .logout-button:hover {
+            background-color: rgba(239, 68, 68, 0.2);
+            transform: rotate(360deg);
+        }
+        
+        @media (max-width: 992px) {
+            .main-navbar {
+                flex-wrap: wrap;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .navbar-menu {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                overflow-x: auto;
+                padding: 0.5rem 0;
+            }
+            
+            .menu-item {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .navbar-actions {
+                gap: 0.75rem;
+            }
+            
+            .user-balance {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.9rem;
+            }
+            
+            .user-profile span {
+                display: none;
+            }
+        }
+
         /* Custom styles specific to task details page */
         .task-header {
-            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            background: #1a237e;
             border-radius: var(--radius-lg);
             padding: 2.5rem;
             margin-bottom: 2.5rem;
@@ -409,42 +579,48 @@
     </style>
 </head>
 <body>
-    <!-- Improved navbar with brand and better aligned elements -->
-    <nav class="navbar">
-        <div class="navbar-brand">
-            <i class="fas fa-tasks"></i> Micro<span>Work</span>
-        </div>
-        <div class="navbar-nav">
-            <div class="nav-item">
-                <a href="#" onclick="navigate('home'); return false;" class="nav-link">
-                    <i class="fas fa-home"></i> Home
+    <!-- Enhanced navbar with glass effect -->
+    <header class="main-header">
+        <nav class="main-navbar">
+            <div class="navbar-brand">
+                <i class="fas fa-tasks"></i> Micro<span>Work</span>
+            </div>
+            
+            <div class="navbar-menu">
+                <a href="#" onclick="navigate('home'); return false;" class="menu-item">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#" onclick="navigate('view_tasks'); return false;" class="menu-item">
+                    <i class="fas fa-search"></i>
+                    <span>Browse Tasks</span>
+                </a>
+                <a href="#" onclick="navigate('my_tasks'); return false;" class="menu-item active">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>My Tasks</span>
+                </a>
+                <a href="#" onclick="navigate('withdraw'); return false;" class="menu-item">
+                    <i class="fas fa-wallet"></i>
+                    <span>Withdraw</span>
                 </a>
             </div>
-            <div class="nav-item">
-                <a href="#" onclick="navigate('view_tasks'); return false;" class="nav-link">
-                    <i class="fas fa-tasks"></i> Browse Tasks
+            
+            <div class="navbar-actions">
+                <div class="user-balance">
+                    <i class="fas fa-coins"></i> <span id="userCoins">0</span>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span id="username"></span>
+                </div>
+                <a href="#" onclick="logout(); return false;" class="logout-button">
+                    <i class="fas fa-sign-out-alt"></i>
                 </a>
             </div>
-            <div class="nav-item">
-                <a href="#" onclick="navigate('my_tasks'); return false;" class="nav-link active">
-                    <i class="fas fa-clipboard-list"></i> My Tasks
-                </a>
-            </div>
-        </div>
-        <div class="user-menu">
-            <div class="user-balance">
-                <i class="fas fa-coins"></i> <span id="userCoins">0</span>
-            </div>
-            <div class="user-info">
-                <span id="username"></span>
-            </div>
-            <div class="nav-item">
-                <a href="#" onclick="logout(); return false;" class="nav-link">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
-            </div>
-        </div>
-    </nav>
+        </nav>
+    </header>
 
     <div class="main-container">
         <div id="taskDetails" class="task-header">
