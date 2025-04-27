@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - MicroWork</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Enhanced navbar with glass effect and better styling -->
+    <header class="main-header">
+        <nav class="main-navbar">
+            <div class="navbar-brand">
+                <i class="fas fa-tasks"></i> <span>Micro</span><span>Work</span>
+            </div>
+            
+            <div class="navbar-menu">
+                <a href="#" onclick="navigate('home'); return false;" class="menu-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#" onclick="navigate('view_tasks'); return false;" class="menu-item">
+                    <i class="fas fa-search"></i>
+                    <span>Browse Tasks</span>
+                </a>
+                <a href="#" onclick="navigate('my_tasks'); return false;" class="menu-item">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>My Tasks</span>
+                </a>
+                <a href="#" onclick="navigate('withdraw'); return false;" class="menu-item">
+                    <i class="fas fa-wallet"></i>
+                    <span>Withdraw</span>
+                </a>
+            </div>
+            
+            <div class="navbar-actions">
+                <div class="user-balance">
+                    <i class="fas fa-coins"></i> <span id="userCoins">0</span>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span id="username"></span>
+                </div>
+                <a href="#" onclick="logout(); return false;" class="logout-button">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </div>
+        </nav>
+    </header>
+    
+    <style>
+        /* Enhanced navbar styles */
+        .main-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            margin-bottom: 2rem;
+        }
+        
+        .main-navbar {
+            background: rgba(24, 27, 61, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-radius: var(--radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .navbar-brand i {
+            color: #2941c9;
+        }
+        
+        .navbar-brand span {
+            background: linear-gradient(to right, #4361ee, #7a89ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .menu-item {
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .menu-item.active {
+            background-color: rgba(41, 65, 201, 0.15);
+            color: #4361ee;
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .user-balance {
+            background: linear-gradient(135deg, #2941c9, #4361ee);
+            padding: 0.6rem 1.25rem;
+            border-radius: 50px;
+            color: white;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(41, 65, 201, 0.3);
+        }
+        
+        .user-balance i {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background-color: rgba(255, 255, 255, 0.06);
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4361ee, #7a89ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: white;
+        }
+        
+        .logout-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        
+        .logout-button:hover {
+            background-color: rgba(239, 68, 68, 0.2);
+            transform: rotate(360deg);
+        }
+        
+        @media (max-width: 992px) {
+            .main-navbar {
+                flex-wrap: wrap;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .navbar-menu {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                overflow-x: auto;
+                padding: 0.5rem 0;
+            }
+            
+            .menu-item {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .navbar-actions {
+                gap: 0.75rem;
+            }
+            
+            .user-balance {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.9rem;
+            }
+            
+            .user-profile span {
+                display: none;
+            }
+        }
+    </style>
+
+    <!-- Enhanced Hero Section with blurs and better visuals -->
+    <div class="hero-section">
+        <div class="hero-blur-circle hero-blur-1"></div>
+        <div class="hero-blur-circle hero-blur-2"></div>
+        <div class="hero-blur-circle hero-blur-3"></div>
+        
+        <div class="hero-content">
+            <h1 class="hero-title">Find & Complete <span>Micro Tasks</span></h1>
+            <p class="hero-subtitle">Work on small tasks and get paid instantly. Join thousands of workers earning daily.</p>
+            
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <div class="stat-value">5K+</div>
+                    <div class="stat-label">Active Tasks</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <div class="stat-value">10K+</div>
+                    <div class="stat-label">Workers</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <div class="stat-value">$1M+</div>
+                    <div class="stat-label">Paid Out</div>
+                </div>
+            </div>
+            
+            <div class="hero-buttons">
+                <a href="#" onclick="navigate('view_tasks'); return false;" class="btn-primary pulse-effect">
+                    <i class="fas fa-search"></i> Find Tasks
+                </a>
+                <a href="#create-task" class="btn-secondary glow-on-hover">
+                    <i class="fas fa-plus-circle"></i> Create Task
+                </a>
+            </div>
+            
+            <div class="hero-search">
+                <div class="search-container">
+                    <div class="search-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <input type="text" placeholder="Search for tasks (e.g. data entry, transcription)..." class="search-input">
+                    <button class="search-button">
+                        Search
+                    </button>
+                </div>
+                <div class="search-tags">
+                    <span class="search-tag">Data Entry</span>
+                    <span class="search-tag">Writing</span>
+                    <span class="search-tag">Design</span>
+                    <span class="search-tag">Research</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        /* Enhanced hero section styles */
+        .hero-section {
+            background-color: var(--dark-bg);
+            padding: var(--element-padding-lg);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-xl);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        
+        @media (max-width: 1024px) {
+            .hero-section {
+                padding: var(--element-padding-md);
+                margin-bottom: var(--spacing-lg);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: var(--element-padding-sm);
+                margin-bottom: var(--spacing-md);
+                border-radius: calc(var(--radius-lg) - 0.2rem);
+            }
+        }
+        
+        .hero-blur-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(var(--bg-blur-desktop));
+            opacity: 0.3;
+            z-index: 0;
+            transition: all 0.5s ease;
+        }
+        
+        @media (max-width: 1024px) {
+            .hero-blur-circle {
+                filter: blur(var(--bg-blur-tablet));
+                transform: scale(0.85);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-blur-circle {
+                filter: blur(var(--bg-blur-mobile));
+                transform: scale(0.7);
+            }
+        }
+        
+        .hero-blur-1 {
+            background: linear-gradient(to right, #4361ee, #3a56d4);
+            width: 400px;
+            height: 400px;
+            top: -150px;
+            left: -100px;
+        }
+        
+        .hero-blur-2 {
+            background: linear-gradient(to right, #2941c9, #1c309e);
+            width: 350px;
+            height: 350px;
+            bottom: -150px;
+            right: -50px;
+        }
+        
+        .hero-blur-3 {
+            background: radial-gradient(circle, rgba(67, 97, 238, 0.4) 0%, rgba(255, 255, 255, 0) 70%);
+            width: 300px;
+            height: 300px;
+            top: 40%;
+            left: 40%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .hero-title {
+            font-size: 3.2rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #fff, #b4b8e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+        
+        .hero-title span {
+            background: linear-gradient(to right, #4361ee, #7a89ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-divider {
+            width: 1px;
+            height: 50px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        .pulse-effect {
+            animation: pulse 2s infinite;
+        }
+        
+        .btn-primary {
+            padding: 1rem 2rem;
+            background-color: #2941c9;
+            color: white;
+            border-radius: 50px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(41, 65, 201, 0.4);
+        }
+        
+        .btn-primary:hover {
+            background-color: #3a56d4;
+            color: #000;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(41, 65, 201, 0.6);
+        }
+        
+        .btn-primary:hover i {
+            color: #000;
+        }
+        
+        .btn-secondary {
+            padding: 1rem 2rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            border-radius: 50px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-decoration: none;
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
+        }
+        
+        .glow-on-hover:hover {
+            box-shadow: 0 0 20px rgba(122, 137, 255, 0.5);
+        }
+        
+        .hero-search {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            color: var(--text-muted);
+        }
+        
+        .search-input {
+            flex: 1;
+            height: 56px;
+            padding: 0 1.5rem 0 3rem;
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: rgba(0, 0, 0, 0.2);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.25);
+        }
+        
+        .search-button {
+            position: absolute;
+            right: 8px;
+            height: 40px;
+            border-radius: 20px;
+            background-color: #2941c9;
+            color: white;
+            font-weight: 600;
+            border: none;
+            padding: 0 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .search-button:hover {
+            background-color: #3a56d4;
+            color: #000;
+        }
+        
+        .search-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+        
+        .search-tag {
+            display: inline-block;
+            padding: 0.35rem 1rem;
+            background-color: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .search-tag:hover {
+            background-color: rgba(41, 65, 201, 0.2);
+            color: var(--primary-color);
+        }
+        
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 3rem 1.5rem;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .hero-stats {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            
+            .stat-divider {
+                width: 50px;
+                height: 1px;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+
+    <!-- Enhanced Features Section -->
+    <div class="features-section">
+        <div class="section-header">
+            <h2>Why Choose <span>MicroWork</span></h2>
+            <p>Join thousands of workers and task creators on our platform</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Secure Payments</h3>
+                <p>All transactions are securely processed with industry-leading encryption and protocols</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3>Quick Tasks</h3>
+                <p>Complete small tasks in minutes and get paid instantly to your account</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Global Community</h3>
+                <p>Connect with professional freelancers and clients from around the world</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3>24/7 Support</h3>
+                <p>Our customer service team is always ready to help with any issues</p>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        /* Enhanced features section */
+        .features-section {
+            max-width: 1200px;
+            margin: 0 auto 4rem;
+            padding: 0 1.5rem;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #fff, #e9eaff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+            border-bottom: none;
+        }
+        
+        .section-header h2 span {
+            background: linear-gradient(to right, #4361ee, #7a89ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            background: linear-gradient(145deg, rgba(37, 42, 102, 0.8), rgba(24, 27, 61, 0.8));
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.5s ease forwards;
+            animation-delay: calc(var(--index) * 0.1s);
+            opacity: 0;
+        }
+        
+        .feature-card:nth-child(1) { --index: 1; }
+        .feature-card:nth-child(2) { --index: 2; }
+        .feature-card:nth-child(3) { --index: 3; }
+        .feature-card:nth-child(4) { --index: 4; }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(225deg, rgba(67, 97, 238, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            border-color: rgba(67, 97, 238, 0.3);
+        }
+        
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+        
+        .feature-icon-wrapper {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #2941c9, #3a56d4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 8px 20px rgba(41, 65, 201, 0.3);
+        }
+        
+        .feature-card i {
+            font-size: 1.75rem;
+            color: white;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+        }
+        
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            .features-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1.5rem;
+            }
+            
+            .feature-card {
+                padding: 1.5rem;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+    <!-- Create Task and Quick Actions Section -->
+    <div class="action-panels" id="create-task">
+        <div class="action-panels-container">
+            <div class="panel panel-create-task">
+                <div class="panel-header">
+                    <div class="panel-icon">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <h3>Create a New Task</h3>
+                </div>
+                
+                <div class="panel-body">
+                    <form id="createTaskForm" onsubmit="createTask(event)">
+                        <div class="form-group">
+                            <label for="taskTitle">
+                                <i class="fas fa-heading"></i> Task Title
+                            </label>
+                            <input type="text" id="taskTitle" placeholder="What needs to be done?" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="taskDescription">
+                                <i class="fas fa-align-left"></i> Task Description
+                            </label>
+                            <textarea id="taskDescription" rows="4" placeholder="Provide detailed instructions for the worker..." required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="taskPrize">
+                                <i class="fas fa-coins"></i> Prize Amount
+                            </label>
+                            <div class="prize-input">
+                                <input type="number" id="taskPrize" min="1" placeholder="How many coins?" required>
+                                <div class="prize-info">Coins</div>
+                            </div>
+                            <div class="input-hint">Higher rewards attract more workers and faster completions</div>
+                        </div>
+                        
+                        <div id="createTaskError" class="form-error" style="display: none;"></div>
+                        
+                        <button type="submit" class="submit-button">
+                            <i class="fas fa-rocket"></i> Create Task
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="panel panel-quick-actions">
+                <div class="panel-header">
+                    <div class="panel-icon pulse-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3>Quick Actions</h3>
+                </div>
+                
+                <div class="panel-body">
+                    <div class="action-cards">
+                        <a href="#" onclick="navigate('view_tasks'); return false;" class="action-card">
+                            <div class="action-icon blue">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <div class="action-content">
+                                <h4>Browse Tasks</h4>
+                                <p>Find tasks to complete and earn coins</p>
+                            </div>
+                            <div class="action-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        
+                        <a href="#" onclick="navigate('my_tasks'); return false;" class="action-card">
+                            <div class="action-icon purple">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                            <div class="action-content">
+                                <h4>My Tasks</h4>
+                                <p>Manage your created and submitted tasks</p>
+                            </div>
+                            <div class="action-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                        
+                        <a href="#" onclick="navigate('withdraw'); return false;" class="action-card">
+                            <div class="action-icon green">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <div class="action-content">
+                                <h4>Withdraw</h4>
+                                <p>Cash out your earned coins to your wallet</p>
+                            </div>
+                            <div class="action-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+
+                        <a href="#" onclick="navigate('payment'); return false;" class="action-card">
+                            <div class="action-icon purple">
+                                <i class="fas fa-credit-card"></i>
+                            </div>
+                            <div class="action-content">
+                                <h4>Payment</h4>
+                                <p>Add or manage your payment methods</p>
+                            </div>
+                            <div class="action-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        /* Action Panels styling */
+        .action-panels {
+            max-width: 1200px;
+            margin: 0 auto 4rem;
+            padding: 0 1rem;
+        }
+        
+        .action-panels-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        .panel {
+            background: rgba(24, 27, 61, 0.6);
+            border-radius: var(--radius);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border-color: rgba(67, 97, 238, 0.3);
+        }
+        
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(145deg, rgba(41, 65, 201, 0.2), rgba(24, 27, 61, 0.2));
+        }
+        
+        .panel-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(145deg, #2941c9, #3a56d4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            box-shadow: 0 8px 16px rgba(41, 65, 201, 0.3);
+        }
+        
+        .pulse-icon {
+            animation: pulse 2s infinite;
+        }
+        
+        .panel-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+        
+        .panel-body {
+            padding: 2rem 1.5rem;
+        }
+        
+        /* Form styling */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+        
+        .form-group label i {
+            color: #4361ee;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4361ee;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.25);
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+        
+        .prize-input {
+            position: relative;
+        }
+        
+        .prize-info {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .input-hint {
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        .form-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius);
+            margin-bottom: 1.5rem;
+            border-left: 3px solid #ef4444;
+            font-size: 0.9rem;
+        }
+        
+        .submit-button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(145deg, #2941c9, #3a56d4);
+            border: none;
+            border-radius: var(--radius);
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(41, 65, 201, 0.3);
+        }
+        
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(41, 65, 201, 0.4);
+        }
+        
+        /* Action cards */
+        .action-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .action-card {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .action-card:hover {
+            background-color: rgba(0, 0, 0, 0.3);
+            transform: translateX(5px);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .action-icon.blue {
+            background: linear-gradient(145deg, #2941c9, #3a56d4);
+            box-shadow: 0 4px 12px rgba(41, 65, 201, 0.3);
+        }
+        
+        .action-icon.purple {
+            background: linear-gradient(145deg, #7a30cf, #5e28b8);
+            box-shadow: 0 4px 12px rgba(122, 48, 207, 0.3);
+        }
+        
+        .action-icon.green {
+            background: linear-gradient(145deg, #10b981, #059669);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        
+        .action-content {
+            flex: 1;
+        }
+        
+        .action-content h4 {
+            margin: 0 0 0.25rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .action-content p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .action-arrow {
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+        
+        .action-card:hover .action-arrow {
+            color: var(--primary-color);
+            transform: translateX(3px);
+        }
+        
+        @media (max-width: 992px) {
+            .action-panels-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+        <!-- Recent Tasks Section -->
+        <div class="recent-tasks-section">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-history"></i>
+                    <h3>Recent Tasks</h3>
+                </div>
+                <a href="#" onclick="navigate('view_tasks'); return false;" class="view-all-link">
+                    View All <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div id="recentTasks">
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <p>Loading recent tasks...</p>
+                </div>
+            </div>
+        </div>
+        
+        <style>
+            /* Recent Tasks Section */
+            .recent-tasks-section {
+                background-color: var(--dark-bg);
+                border-radius: var(--radius);
+                padding: 2rem;
+                margin-bottom: 3rem;
+                border: 1px solid var(--border-color);
+                box-shadow: var(--shadow);
+            }
+            
+            .section-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .section-title {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+            
+            .section-title i {
+                font-size: 1.5rem;
+                color: #2941c9;
+            }
+            
+            .section-title h3 {
+                margin: 0;
+                font-size: 1.5rem;
+                color: var(--text-light);
+                font-weight: 600;
+            }
+            
+            .view-all-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                color: var(--primary-color);
+                font-weight: 600;
+                font-size: 0.95rem;
+                transition: all 0.2s ease;
+                text-decoration: none;
+            }
+            
+            .view-all-link:hover {
+                color: #2941c9;
+                transform: translateX(3px);
+            }
+            
+            .loading-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 3rem 1rem;
+                color: var(--text-muted);
+            }
+            
+            .loading-spinner {
+                width: 40px;
+                height: 40px;
+                border: 3px solid rgba(67, 97, 238, 0.3);
+                border-radius: 50%;
+                border-top-color: #2941c9;
+                animation: spin 1s ease-in-out infinite;
+                margin-bottom: 1rem;
+            }
+            
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+        </style>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-copyright">
+                &copy; 2025 MicroWork. All rights reserved.
+            </div>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Us</a>
+                <a href="#">Help Center</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        const user = getCurrentUser();
+        
+        // Redirect to login if not logged in
+        if (!user) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('username').textContent = user;
+        }
+
+        // Load user's coin balance
+        loadCoins('userCoins');
+
+        // Create a new task
+        async function createTask(e) {
+            e.preventDefault();
+            
+            const errorElement = document.getElementById('createTaskError');
+            errorElement.style.display = 'none';
+            
+            const title = document.getElementById('taskTitle').value;
+            const description = document.getElementById('taskDescription').value;
+            const prize = document.getElementById('taskPrize').value;
+            
+            try {
+                const data = await apiPost('create-task', {
+                    buyer_username: user,
+                    title,
+                    description,
+                    prize
+                });
+                
+                if (data.success) {
+                    alert('Task created successfully!');
+                    document.getElementById('createTaskForm').reset();
+                    loadRecentTasks();
+                } else {
+                    errorElement.textContent = data.message || 'Failed to create task';
+                    errorElement.style.display = 'block';
+                }
+            } catch (error) {
+                errorElement.textContent = error.message;
+                errorElement.style.display = 'block';
+            }
+        }
+
+        // Load recent tasks
+        async function loadRecentTasks() {
+            try {
+                const data = await apiGet('list-tasks', { username: user, limit: 6 });
+                
+                const tasksList = document.getElementById('recentTasks');
+                
+                if (!data.tasks || data.tasks.length === 0) {
+                    tasksList.innerHTML = '<div class="col-12"><div class="alert alert-info">No tasks available.</div></div>';
+                    return;
+                }
+                
+                tasksList.innerHTML = `<div class="task-grid">` + 
+                    data.tasks.slice(0, 3).map(task => `
+                    <div class="task-card">
+                        <div class="task-price-tag">
+                            <i class="fas fa-coins"></i> ${task.prize}
+                        </div>
+                        
+                        <div class="task-left">
+                            <div class="task-header-info">
+                                <div>
+                                    <h3>${task.title}</h3>
+                                    <span class="status ${task.status}">${task.status}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-description">
+                                ${task.description}
+                            </div>
+                            
+                            <div class="task-meta">
+                                <div class="task-meta-item">
+                                    <i class="fas fa-user"></i> Posted by: ${task.buyer_username}
+                                </div>
+                                <div class="task-meta-item">
+                                    <i class="fas fa-calendar-alt"></i> ${new Date().toLocaleDateString()}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="task-right">
+                            <div class="task-difficulty">
+                                <div>Difficulty</div>
+                                <div class="difficulty-level">
+                                    <div class="difficulty-dot active"></div>
+                                    <div class="difficulty-dot ${task.prize > 50 ? 'active' : ''}"></div>
+                                    <div class="difficulty-dot ${task.prize > 100 ? 'active' : ''}"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="task-time">
+                                <i class="fas fa-clock time-icon"></i>
+                                <div>5-10 minutes</div>
+                            </div>
+                            
+                            ${task.is_owner ? `
+                                <div class="task-cta">
+                                    <button class="task-btn" onclick="navigate('task_details', {task: ${task.task_id}})">
+                                        <i class="fas fa-clipboard-check"></i> Manage Task
+                                    </button>
+                                </div>
+                            ` : ''}
+                            
+                            ${!task.is_owner && task.status === 'open' ? `
+                                <div class="task-cta">
+                                    <button class="task-btn" onclick="navigate('submit', {task: ${task.task_id}})">
+                                        <i class="fas fa-paper-plane"></i> Submit Work
+                                    </button>
+                                </div>
+                            ` : !task.is_owner && task.status === 'closed' ? `
+                                <div class="task-cta">
+                                    <button class="task-btn secondary" disabled>
+                                        <i class="fas fa-lock"></i> Task Closed
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('') + `
+                    <div style="text-align: center; margin-top: 1rem;">
+                        <a href="#" onclick="navigate('view_tasks'); return false;" 
+                            style="display: inline-block; padding: 0.75rem 1.5rem; background-color: var(--card-bg); 
+                            color: var(--primary-color); text-decoration: none; font-weight: 600; 
+                            border-radius: var(--radius); border: 1px solid var(--border-color); 
+                            transition: var(--transition);">
+                            View All Tasks <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>`;
+            } catch (error) {
+                document.getElementById('recentTasks').innerHTML = `<p>Error loading tasks: ${error.message}</p>`;
+            }
+        }
+
+        // Simplified animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add basic fade-in to feature cards with less delay
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach((card) => {
+                card.classList.add('fade-in');
+            });
+        });
+
+        // Initial load
+        loadRecentTasks();
+    </script>
+</body>
+</html>

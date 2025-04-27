@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Tasks - MicroWork</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom styles specific to view tasks page */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .page-header h2 {
+            margin: 0;
+            font-size: 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-light);
+        }
+        
+        .task-filters {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem 1.25rem;
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .custom-checkbox {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: var(--radius);
+        }
+        
+        .custom-checkbox:hover {
+            color: var(--text-light);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .custom-checkbox input {
+            margin-right: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            background-color: var(--medium-bg);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .task-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .task-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: row;
+            position: relative;
+        }
+        
+        .task-card:hover {
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary-color);
+        }
+        
+        .task-price-tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #2941c9; /* Darker blue than primary-color */
+            color: white;
+            padding: 0.4rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            z-index: 2;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .task-left {
+            width: 70%;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border-right: 1px solid var(--border-color);
+        }
+        
+        .task-right {
+            width: 30%;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+        
+        .task-header-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding-right: 5rem; /* Make room for price tag */
+        }
+        
+        .task-header-info h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 0.35rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status.open {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .status.closed {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .task-description {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+        
+        .task-meta {
+            display: flex;
+            gap: 1.25rem;
+            margin-top: auto;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 1rem;
+        }
+        
+        .task-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        
+        .task-meta i {
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+        
+        .task-cta {
+            margin-top: 1rem;
+        }
+        
+        .task-btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--radius);
+            border: none;
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            justify-content: center;
+            font-size: 0.95rem;
+            width: 100%;
+        }
+        
+        .task-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .task-btn.secondary {
+            background-color: var(--medium-bg);
+            color: var(--text-light);
+            border: 1px solid var(--border-color);
+        }
+        
+        .task-btn.secondary:hover {
+            background-color: var(--dark-bg);
+        }
+        
+        .task-difficulty {
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+        }
+        
+        .difficulty-level {
+            display: flex;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+        
+        .difficulty-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--border-color);
+            margin: 0 2px;
+        }
+        
+        .difficulty-dot.active {
+            background-color: var(--primary-color);
+        }
+        
+        .task-time {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .time-icon {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+        }
+        
+        .owner-options {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed var(--border-color);
+        }
+        
+        .owner-options h4 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .submission {
+            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .submission p {
+            margin: 0.5rem 0;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .submission i {
+            color: var(--primary-color);
+        }
+        
+        .submission-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, var(--card-bg) 25%, rgba(255, 255, 255, 0.05) 50%, var(--card-bg) 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
+            border-radius: var(--radius);
+            height: 20px;
+            margin-bottom: 0.5rem;
+        }
+        
+        @keyframes skeleton-loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        
+        .skeleton-task {
+            height: 100%;
+            padding: 1.25rem;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+        }
+        
+        .skeleton-header {
+            height: 24px;
+            margin-bottom: 1rem;
+            width: 80%;
+        }
+        
+        .skeleton-status {
+            height: 20px;
+            width: 60px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .skeleton-text {
+            height: 16px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .skeleton-text:last-of-type {
+            width: 80%;
+        }
+        
+        .skeleton-info {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .skeleton-info-item {
+            height: 20px;
+            width: 100px;
+        }
+        
+        .skeleton-button {
+            height: 40px;
+            margin-top: 1rem;
+        }
+        
+        /* Navbar styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .navbar-brand span {
+            color: var(--primary-color);
+        }
+        
+        .navbar-nav {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .nav-item {
+            position: relative;
+        }
+        
+        .nav-link {
+            padding: 0.5rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-balance {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            padding: 0.4rem 0.75rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        
+        .user-info {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        /* Container for page content */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem 2rem;
+        }
+        
+        /* Footer styles */
+        .footer {
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1rem;
+        }
+        
+        .footer-copyright {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .navbar-nav, .user-menu {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .task-filters {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .filter-group, .filter-buttons {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            
+            .task-card {
+                flex-direction: column;
+            }
+            
+            .task-left, .task-right {
+                width: 100%;
+                border-right: none;
+            }
+            
+            .task-left {
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .task-right {
+                padding-top: 1rem;
+            }
+            
+            .task-difficulty, .task-time {
+                display: inline-block;
+                margin: 0 1rem 1rem;
+            }
+            
+            .task-cta {
+                width: 100%;
+            }
+            
+            .task-price-tag {
+                top: 10px;
+                right: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .page-header h2 {
+                font-size: 1.5rem;
+            }
+            
+            .filter-buttons {
+                flex-wrap: wrap;
+            }
+            
+            .filter-btn {
+                flex: 1;
+                justify-content: center;
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+            
+            .task-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .task-header-info h3 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Enhanced navbar with glass effect and better styling -->
+    <header class="main-header">
+        <nav class="main-navbar">
+            <div class="navbar-brand">
+                <i class="fas fa-tasks"></i> <span>Micro</span><span>Work</span>
+            </div>
+            
+            <div class="navbar-menu">
+                <a href="#" onclick="navigate('home'); return false;" class="menu-item">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#" onclick="navigate('view_tasks'); return false;" class="menu-item active">
+                    <i class="fas fa-search"></i>
+                    <span>Browse Tasks</span>
+                </a>
+                <a href="#" onclick="navigate('my_tasks'); return false;" class="menu-item">
+                    <i class="fas fa-clipboard-list"></i>
+                    <span>My Tasks</span>
+                </a>
+                <a href="#" onclick="navigate('withdraw'); return false;" class="menu-item">
+                    <i class="fas fa-wallet"></i>
+                    <span>Withdraw</span>
+                </a>
+            </div>
+            
+            <div class="navbar-actions">
+                <div class="user-balance">
+                    <i class="fas fa-coins"></i> <span id="userCoins">0</span>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span id="username"></span>
+                </div>
+                <a href="#" onclick="logout(); return false;" class="logout-button">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
+            </div>
+        </nav>
+    </header>
+    
+    <style>
+        /* Enhanced navbar styles */
+        .main-header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            margin-bottom: 2rem;
+        }
+        
+        .main-navbar {
+            background: rgba(24, 27, 61, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            border-radius: var(--radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .navbar-brand {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .navbar-brand i {
+            color: #2941c9;
+        }
+        
+        .navbar-brand span {
+            background: linear-gradient(to right, #4361ee, #7a89ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .navbar-menu {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .menu-item {
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .menu-item.active {
+            background-color: rgba(41, 65, 201, 0.15);
+            color: #4361ee;
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .user-balance {
+            background: linear-gradient(135deg, #2941c9, #4361ee);
+            padding: 0.6rem 1.25rem;
+            border-radius: 50px;
+            color: white;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(41, 65, 201, 0.3);
+        }
+        
+        .user-balance i {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            background-color: rgba(255, 255, 255, 0.06);
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4361ee, #7a89ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: white;
+        }
+        
+        .logout-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        
+        .logout-button:hover {
+            background-color: rgba(239, 68, 68, 0.2);
+            transform: rotate(360deg);
+        }
+        
+        @media (max-width: 992px) {
+            .main-navbar {
+                flex-wrap: wrap;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .navbar-menu {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                overflow-x: auto;
+                padding: 0.5rem 0;
+            }
+            
+            .menu-item {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .navbar-actions {
+                gap: 0.75rem;
+            }
+            
+            .user-balance {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.9rem;
+            }
+            
+            .user-profile span {
+                display: none;
+            }
+        }
+    </style>
+
+    <div class="main-container">
+        <div class="page-header">
+            <h2>
+                <i class="fas fa-list"></i> Available Tasks
+            </h2>
+        </div>
+        
+        <div class="task-filters">
+            <div class="filter-group">
+                <label class="custom-checkbox">
+                    <input type="checkbox" id="showMyTasks" onchange="fetchTasks()">
+                    <i class="fas fa-filter"></i> Show only my submissions
+                </label>
+            </div>
+            
+            <div class="filter-buttons">
+                <button id="allTasksBtn" class="filter-btn active" onclick="setActiveFilter(this, '')">
+                    <i class="fas fa-th-list"></i> All Tasks
+                </button>
+                <button id="openTasksBtn" class="filter-btn" onclick="setActiveFilter(this, 'open')">
+                    <i class="fas fa-unlock"></i> Open Only
+                </button>
+            </div>
+        </div>
+        
+        <div id="taskList" class="task-grid">
+            <!-- Skeleton loading state -->
+            <div class="skeleton-task">
+                <div class="skeleton skeleton-header"></div>
+                <div class="skeleton skeleton-status"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton-info">
+                    <div class="skeleton skeleton-info-item"></div>
+                    <div class="skeleton skeleton-info-item"></div>
+                </div>
+                <div class="skeleton skeleton-button"></div>
+            </div>
+            <div class="skeleton-task">
+                <div class="skeleton skeleton-header"></div>
+                <div class="skeleton skeleton-status"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton-info">
+                    <div class="skeleton skeleton-info-item"></div>
+                    <div class="skeleton skeleton-info-item"></div>
+                </div>
+                <div class="skeleton skeleton-button"></div>
+            </div>
+            <div class="skeleton-task">
+                <div class="skeleton skeleton-header"></div>
+                <div class="skeleton skeleton-status"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton-info">
+                    <div class="skeleton skeleton-info-item"></div>
+                    <div class="skeleton skeleton-info-item"></div>
+                </div>
+                <div class="skeleton skeleton-button"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-copyright">
+                &copy; 2025 MicroWork. All rights reserved.
+            </div>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Us</a>
+                <a href="#">Help Center</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        const user = getCurrentUser();
+        let currentFilter = '';
+        
+        // Redirect to login if not logged in
+        if (!user) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('username').textContent = user;
+        }
+
+        // Load user's coin balance
+        loadCoins('userCoins');
+
+        // Set active filter and fetch tasks
+        function setActiveFilter(button, filter) {
+            // Update active button UI
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            button.classList.add('active');
+            
+            // Store current filter and fetch tasks
+            currentFilter = filter;
+            fetchTasks();
+        }
+
+        async function fetchTasks() {
+            try {
+                // Show loading state
+                document.getElementById('taskList').innerHTML = `
+                    <div class="task-card">
+                        <div class="task-left" style="position: relative;">
+                            <div class="skeleton skeleton-header" style="width: 70%; height: 28px; margin-bottom: 15px;"></div>
+                            <div class="skeleton skeleton-status" style="width: 80px; height: 20px; margin-bottom: 25px;"></div>
+                            <div class="skeleton skeleton-text" style="width: 100%; height: 14px;"></div>
+                            <div class="skeleton skeleton-text" style="width: 95%; height: 14px;"></div>
+                            <div class="skeleton skeleton-text" style="width: 90%; height: 14px;"></div>
+                            <div class="skeleton skeleton-info" style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                                <div class="skeleton skeleton-info-item" style="width: 120px; height: 18px;"></div>
+                                <div class="skeleton skeleton-info-item" style="width: 100px; height: 18px;"></div>
+                            </div>
+                        </div>
+                        <div class="task-right" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <div class="skeleton" style="width: 80px; height: 18px; margin-bottom: 10px;"></div>
+                            <div style="display: flex; gap: 5px; margin-bottom: 25px;">
+                                <div class="skeleton" style="width: 10px; height: 10px; border-radius: 50%;"></div>
+                                <div class="skeleton" style="width: 10px; height: 10px; border-radius: 50%;"></div>
+                                <div class="skeleton" style="width: 10px; height: 10px; border-radius: 50%;"></div>
+                            </div>
+                            <div class="skeleton" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 10px;"></div>
+                            <div class="skeleton" style="width: 80px; height: 16px; margin-bottom: 25px;"></div>
+                            <div class="skeleton skeleton-button" style="width: 100%; height: 40px; border-radius: var(--radius);"></div>
+                        </div>
+                    </div>
+                    <div class="task-card">
+                        <div class="task-left" style="position: relative;">
+                            <div class="skeleton skeleton-header" style="width: 60%; height: 28px; margin-bottom: 15px;"></div>
+                            <div class="skeleton skeleton-status" style="width: 80px; height: 20px; margin-bottom: 25px;"></div>
+                            <div class="skeleton skeleton-text" style="width: 100%; height: 14px;"></div>
+                            <div class="skeleton skeleton-text" style="width: 90%; height: 14px;"></div>
+                            <div class="skeleton skeleton-text" style="width: 85%; height: 14px;"></div>
+                            <div class="skeleton skeleton-info" style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed var(--border-color);">
+                                <div class="skeleton skeleton-info-item" style="width: 120px; height: 18px;"></div>
+                                <div class="skeleton skeleton-info-item" style="width: 100px; height: 18px;"></div>
+                            </div>
+                        </div>
+                        <div class="task-right" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <div class="skeleton" style="width: 80px; height: 18px; margin-bottom: 10px;"></div>
+                            <div style="display: flex; gap: 5px; margin-bottom: 25px;">
+                                <div class="skeleton" style="width: 10px; height: 10px; border-radius: 50%;"></div>
+                                <div class="skeleton" style="width: 10px; height: 10px; border-radius: 50%;"></div>
+                                <div class="skeleton" style="width: 10px; height: 10px; border-radius: 50%;"></div>
+                            </div>
+                            <div class="skeleton" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 10px;"></div>
+                            <div class="skeleton" style="width: 80px; height: 16px; margin-bottom: 25px;"></div>
+                            <div class="skeleton skeleton-button" style="width: 100%; height: 40px; border-radius: var(--radius);"></div>
+                        </div>
+                    </div>
+                `;
+                
+                const showMyTasks = document.getElementById('showMyTasks').checked;
+                let endpoint = 'list-tasks';
+                let params = { username: user };
+                
+                if (showMyTasks) {
+                    endpoint = 'get-user-submissions';
+                }
+                
+                if (currentFilter) {
+                    params.filter = currentFilter;
+                }
+                
+                const data = await apiGet(endpoint, params);
+                
+                const taskList = document.getElementById('taskList');
+                
+                if (!data.tasks || data.tasks.length === 0) {
+                    taskList.innerHTML = `
+                        <div class="alert alert-info" style="grid-column: 1 / -1; text-align: center; padding: 2rem;">
+                            <i class="fas fa-info-circle fa-lg" style="margin-right: 10px;"></i> 
+                            No tasks found. ${currentFilter ? 'Try removing filters or' : ''} check back later!
+                        </div>
+                    `;
+                    return;
+                }
+                
+                taskList.innerHTML = data.tasks.map(task => `
+                    <div class="task-card">
+                        <div class="task-price-tag">
+                            <i class="fas fa-coins"></i> ${task.prize}
+                        </div>
+                        
+                        <div class="task-left">
+                            <div class="task-header-info">
+                                <div>
+                                    <h3>${task.title}</h3>
+                                    <span class="status ${task.status}">${task.status}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="task-description">
+                                ${task.description}
+                            </div>
+                            
+                            <div class="task-meta">
+                                <div class="task-meta-item">
+                                    <i class="fas fa-user"></i> Posted by: ${task.buyer_username}
+                                </div>
+                                <div class="task-meta-item">
+                                    <i class="fas fa-calendar-alt"></i> ${new Date().toLocaleDateString()}
+                                </div>
+                                ${task.submissions ? `
+                                <div class="task-meta-item">
+                                    <i class="fas fa-clipboard-check"></i> Submissions: ${task.submissions.length || 0}
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                        
+                        <div class="task-right">
+                            <div class="task-difficulty">
+                                <div>Difficulty</div>
+                                <div class="difficulty-level">
+                                    <div class="difficulty-dot active"></div>
+                                    <div class="difficulty-dot ${task.prize > 50 ? 'active' : ''}"></div>
+                                    <div class="difficulty-dot ${task.prize > 100 ? 'active' : ''}"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="task-time">
+                                <i class="fas fa-clock time-icon"></i>
+                                <div>5-10 minutes</div>
+                            </div>
+                            
+                            ${task.is_owner ? `
+                                <div class="task-cta">
+                                    <button class="task-btn" onclick="navigate('task_details', {task: ${task.task_id}})">
+                                        <i class="fas fa-clipboard-check"></i> Manage Task
+                                    </button>
+                                </div>
+                            ` : ''}
+                            
+                            ${!task.is_owner && task.status === 'open' ? `
+                                <div class="task-cta">
+                                    <button class="task-btn" onclick="navigate('submit', {task: ${task.task_id}})">
+                                        <i class="fas fa-paper-plane"></i> Submit Work
+                                    </button>
+                                </div>
+                            ` : !task.is_owner && task.status === 'closed' ? `
+                                <div class="task-cta">
+                                    <button class="task-btn secondary" disabled>
+                                        <i class="fas fa-lock"></i> Task Closed
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                document.getElementById('taskList').innerHTML = `
+                    <div class="alert alert-danger" style="grid-column: 1 / -1;">
+                        <i class="fas fa-exclamation-circle"></i> Error loading tasks: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Approve a submission
+        async function approveSubmission(taskId, submissionId) {
+            if (!confirm('Are you sure you want to approve this submission?')) return;
+            
+            try {
+                const data = await apiPost('approve-submission', {
+                    submission_id: submissionId,
+                    buyer_username: user,
+                    task_id: taskId
+                });
+                
+                if (data.success) {
+                    alert('Submission approved successfully!');
+                    fetchTasks();
+                    loadCoins('userCoins');
+                } else {
+                    alert(data.message || 'Approval failed');
+                }
+            } catch (error) {
+                alert('Approval failed: ' + error.message);
+            }
+        }
+
+        // Initial load
+        fetchTasks();
+    </script>
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Work - MicroWork</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+<style>
+    /* Enhanced navbar styles */
+    .main-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        margin-bottom: 2rem;
+    }
+
+    .main-navbar {
+        background: rgba(24, 27, 61, 0.8);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 1rem 2rem;
+        border-radius: var(--radius);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .navbar-brand {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .navbar-brand i {
+        color: #2941c9;
+    }
+
+    .navbar-brand span {
+        background: linear-gradient(to right, #4361ee, #7a89ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .navbar-menu {
+        display: flex;
+        gap: 0.25rem;
+    }
+
+    .menu-item {
+        padding: 0.75rem 1.25rem;
+        border-radius: var(--radius);
+        color: var(--text-muted);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .menu-item.active {
+        background-color: rgba(41, 65, 201, 0.15);
+        color: #4361ee;
+    }
+
+    .menu-item:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .navbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .user-balance {
+        background: linear-gradient(135deg, #2941c9, #4361ee);
+        padding: 0.6rem 1.25rem;
+        border-radius: 50px;
+        color: white;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 4px 15px rgba(41, 65, 201, 0.3);
+    }
+
+    .user-balance i {
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 1rem;
+        background-color: rgba(255, 255, 255, 0.06);
+        border-radius: 50px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: var(--text-light);
+    }
+
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4361ee, #7a89ff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        color: white;
+    }
+
+    .logout-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .logout-button:hover {
+        background-color: rgba(239, 68, 68, 0.2);
+        transform: rotate(360deg);
+    }
+
+    @media (max-width: 992px) {
+        .main-navbar {
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .navbar-menu {
+            order: 3;
+            width: 100%;
+            justify-content: center;
+            overflow-x: auto;
+            padding: 0.5rem 0;
+        }
+
+        .menu-item {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .navbar-actions {
+            gap: 0.75rem;
+        }
+
+        .user-balance {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .user-profile span {
+            display: none;
+        }
+    }
+</style>
+</head>
+<body>
+    <header class="main-header">
+        <nav class="main-navbar">
+            <div class="navbar-brand">
+                <i class="fas fa-tasks"></i> Micro<span>Work</span>
+            </div>
+            <div class="navbar-menu">
+                <a href="home.html" class="menu-item active">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="view_tasks.html" class="menu-item">
+                    <i class="fas fa-tasks"></i> View Tasks
+                </a>
+                <a href="my_tasks.html" class="menu-item">
+                    <i class="fas fa-clipboard-list"></i> My Tasks
+                </a>
+            </div>
+            <div class="navbar-actions">
+                <div class="user-balance">
+                    <i class="fas fa-coins"></i> <span id="userCoins">0</span>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <span>A</span>
+                    </div>
+                    <span id="username"></span>
+                </div>
+                <button class="logout-button" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>
+            <i class="fas fa-paper-plane"></i> Submit Work
+        </h2>
+        <div id="taskDetails" class="task-header">
+            <p>Loading task details...</p>
+        </div>
+
+        <div class="error" id="submissionError" style="display: none;"></div>
+
+        <div class="submission-form">
+            <form id="submitForm" onsubmit="handleSubmit(event)">
+                <div class="form-group">
+                    <label for="answer">
+                        <i class="fas fa-edit"></i> Your Solution
+                    </label>
+                    <textarea id="answer" rows="8" placeholder="Enter your solution..." required></textarea>
+                    <p class="text-muted">Provide a thorough and professional solution to increase your chances of approval.</p>
+                </div>
+                <div class="submission-actions">
+                    <button type="button" class="btn-secondary" onclick="navigate('view_tasks')">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-paper-plane"></i> Submit Work
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 MicroWork. All rights reserved.</p>
+        <div>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Contact Us</a>
+        </div>
+    </footer>
+
+    <script src="js/api.js"></script>
+    <script>
+        const user = getCurrentUser();
+        const taskId = new URLSearchParams(window.location.search).get('task');
+
+        // Redirect to login if not logged in
+        if (!user) {
+            window.location.href = 'index.html';
+            throw new Error('User not logged in');
+        } else {
+            document.getElementById('username').textContent = user;
+        }
+
+        // Redirect if no task ID
+        if (!taskId) {
+            window.location.href = 'view_tasks.html?user=' + encodeURIComponent(user);
+            throw new Error('No task ID provided');
+        }
+
+        // Load user's coin balance
+        loadCoins('userCoins');
+
+        // Load task details
+        async function loadTaskDetails() {
+            try {
+                const data = await apiGet('get-task', { task_id: taskId });
+
+                if (!data.task) {
+                    document.getElementById('taskDetails').innerHTML = '<p>Task not found.</p>';
+                    document.getElementById('submitForm').style.display = 'none';
+                    return;
+                }
+
+                const task = data.task;
+
+                document.getElementById('taskDetails').innerHTML = `
+                    <div class="task-card">
+                        <h3>${task.title}</h3>
+                        <p>${task.description}</p>
+                        <div class="task-info">
+                            <div class="price">
+                                <i class="fas fa-coins"></i> ${task.prize} coins
+                            </div>
+                            <div class="buyer">
+                                <i class="fas fa-user"></i> ${task.buyer_username}
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <span class="status ${task.status}">${task.status}</span>
+                        </div>
+                    </div>
+                `;
+
+                // Disable form if task is not open or user is the buyer
+                if (task.status !== 'open' || task.buyer_username === user) {
+                    document.getElementById('submitForm').style.display = 'none';
+                    document.getElementById('taskDetails').innerHTML += `
+                        <div class="error">
+                            ${task.status !== 'open' ? 'This task is no longer accepting submissions.' : 'You cannot submit work for your own task.'}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('taskDetails').innerHTML = `<p>Error loading task: ${error.message}</p>`;
+                document.getElementById('submitForm').style.display = 'none';
+            }
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+
+            const errorElement = document.getElementById('submissionError');
+            errorElement.style.display = 'none';
+
+            const answer = document.getElementById('answer').value;
+
+            try {
+                const data = await apiPost('submit-work', {
+                    task_id: taskId,
+                    worker_username: user,
+                    sub_answer: answer
+                });
+
+                if (data.success) {
+                    alert('Work submitted successfully!');
+                    window.location.href = 'my_tasks.html?user=' + encodeURIComponent(user);
+                } else {
+                    errorElement.textContent = data.message || 'Submission failed';
+                    errorElement.style.display = 'block';
+                }
+            } catch (error) {
+                errorElement.textContent = error.message;
+                errorElement.style.display = 'block';
+            }
+        }
+
+        // Load task details when page loads
+        loadTaskDetails();
+    </script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - MicroWork</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .auth-container {
+            display: flex;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background-color: var(--light-bg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(67, 97, 238, 0.05) 0%, transparent 50%);
+            z-index: 0;
+        }
+
+        .auth-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 500px;
+            padding: 2.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
+        .auth-logo span {
+            color: var(--primary-color);
+        }
+
+        .auth-title {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--text-light);
+        }
+
+        .form-floating {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            background-color: rgba(0, 0, 0, 0.2);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.25);
+        }
+
+        .form-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .form-input:focus + .form-icon {
+            color: var(--primary-color);
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 0.875rem;
+            background-color: #2941c9;
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(41, 65, 201, 0.4);
+        }
+
+        .auth-btn:hover {
+            background-color: #3a56d4;
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(41, 65, 201, 0.6);
+        }
+        
+        .auth-btn:hover i {
+            color: #000;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .auth-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <i class="fas fa-tasks"></i> Micro<span>Work</span>
+            </div>
+            <h2 class="auth-title">Create Account</h2>
+            
+            <div class="alert alert-danger" id="error" style="display: none;"></div>
+            
+            <form id="registerForm" onsubmit="register(event)">
+                <div class="form-floating">
+                    <input type="text" class="form-input" id="username" placeholder="Username" required>
+                    <i class="fas fa-user form-icon"></i>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="email" class="form-input" id="email" placeholder="Email" required>
+                    <i class="fas fa-envelope form-icon"></i>
+                </div>
+                
+                <div class="form-floating">
+                    <input type="password" class="form-input" id="password" placeholder="Password" required>
+                    <i class="fas fa-lock form-icon"></i>
+                </div>
+                
+                <button type="submit" class="auth-btn">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+            </form>
+            
+            <div class="auth-footer">
+                Already have an account? <a href="index.html">Login Now</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        async function register(e) {
+            e.preventDefault();
+            
+            const errorElement = document.getElementById('error');
+            errorElement.style.display = 'none';
+            
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Show loading state
+            const submitButton = document.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+            submitButton.disabled = true;
+            
+            try {
+                const data = await apiPost('register', { username, email, password });
+                
+                if (data.success) {
+                    // Show success message before redirect
+                    errorElement.className = 'alert alert-success';
+                    errorElement.textContent = 'Account created successfully! Redirecting...';
+                    errorElement.style.display = 'block';
+                    
+                    // Redirect after a short delay
+                    setTimeout(() => {
+                        window.location.href = `home.html?user=${encodeURIComponent(username)}`;
+                    }, 1000);
+                } else {
+                    errorElement.className = 'alert alert-danger';
+                    errorElement.textContent = data.message || 'Registration failed';
+                    errorElement.style.display = 'block';
+                    
+                    // Reset button state
+                    submitButton.innerHTML = originalText;
+                    submitButton.disabled = false;
+                }
+            } catch (error) {
+                errorElement.className = 'alert alert-danger';
+                errorElement.textContent = error.message;
+                errorElement.style.display = 'block';
+                
+                // Reset button state
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
+            }
+        }
+        
+        // Simple input focus effects
+        const inputs = document.querySelectorAll('.form-input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.style.borderColor = '#4361ee';
+            });
+            input.addEventListener('blur', function() {
+                if (!this.value) {
+                    this.style.borderColor = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
